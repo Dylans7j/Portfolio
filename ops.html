@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ops // d4rkgunn3r</title>
+<meta name="description" content="SOC / AD home lab, HTB investigations, YARA and Sigma detection rules.">
+<meta name="theme-color" content="#0b0e14">
+<meta name="author" content="Dylan Senez">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://dylans7j.github.io/portfolio/ops.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ops // d4rkgunn3r">
+<meta property="og:description" content="SOC / AD home lab, HTB investigations, YARA and Sigma detection rules.">
+<meta property="og:image" content="https://dylans7j.github.io/portfolio/og.png">
+<meta property="og:url" content="https://dylans7j.github.io/portfolio/ops.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="status-strip" aria-hidden="true">
+    <span class="live">LINK UP</span>
+    <span class="sep">|</span>
+    <span id="clock">--:--:-- UTC</span>
+    <span class="sep">|</span>
+    <span>NODE // D4RK-01</span>
+    <span class="sep">|</span>
+    <span>SCOPE // AUTHORIZED ONLY</span>
+  </div>
+  <div class="topbar">
+    <h1><a href="index.html">Dylan Senez</a></h1>
+    <div class="handle">@<span>d4rkgunn3r</span></div>
+  </div>
+  <nav class="pills" aria-label="Primary">
+    <a href="index.html">home</a>
+    <a href="whoami.html">whoami</a>
+    <a href="tradecraft.html">tradecraft</a>
+    <a href="ops.html" class="active" aria-current="page">ops</a>
+    <a href="research.html">research</a>
+    <a href="certs.html">certs</a>
+    <a href="education.html">education</a>
+    <a href="write-ups.html">write-ups</a>
+    <a href="contact.html">contact</a>
+  </nav>
+  <section class="panel" aria-label="ops">
+<div class="sec-bar">
+      <div class="sec-bar-left">
+        <div class="sec-label">OPS <span class="slash">//</span> <span class="addr">0x00003000</span></div>
+        <h2 class="sec-h1">Lab & operations</h2>
+      </div>
+      <span class="perm">rwx</span>
+    </div>
+    <div class="sec-sub">ATTACK &middot; DETECT &middot; DOCUMENT</div>
+    <p class="sec-lead">Isolated enterprise lab built to attack, detect, and document end-to-end.</p>
+
+    <div class="card">
+      <div class="meta"><span class="tag">LAB</span> &middot; ENTERPRISE SOC / AD</div>
+      <h3>Windows AD &middot; Azure &middot; Microsoft Sentinel &middot; Sysmon</h3>
+      <ul>
+        <li>VMware lab: Windows Server DC, Win10/11 clients, Kali, Azure, Microsoft Sentinel.</li>
+        <li>AD DS, Group Policy, DNS, domain join; Sysmon + PowerShell logging + advanced audit policy.</li>
+        <li>Azure Monitor Agent + Data Collection Rules &rarr; Sentinel; KQL rules validated against Kerberoasting and password spraying.</li>
+        <li>Six-question doc standard per scenario: built &rarr; tested &rarr; evidence &rarr; detection &rarr; remediation.</li>
+      </ul>
+      <p style="margin-top:10px"><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener">OPEN REPO ↗</a></p>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="tag">HTB</span> &middot; BLUE TEAM TRACK</div>
+      <h3>Incident investigation & memory forensics</h3>
+      <ul>
+        <li>6 Sherlock labs &mdash; full attack timelines from auth logs, Event Logs, Sysmon, Linux logs, network telemetry.</li>
+        <li>Volatility WannaCry analysis &mdash; yara-scanned dumps for shadow-volume-deletion tradecraft across <code>@WanaDecryptor@</code>.</li>
+        <li>Splunk + Elastic lab stacks; 100+ machine attack-path research.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="tag">DETECTION</span> &middot; RULE LIBRARY</div>
+      <h3>YARA + Sigma &mdash; 15 validated rules</h3>
+      <ul>
+        <li>YARA: Mimikatz, Cobalt Strike, PHP webshells, Rubeus, Sliver, reverse shells, UPX.</li>
+        <li>Sigma: LSASS access, PS cradles, Kerberoasting, DCSync, web-spawn-shell, certutil LOLBin, WMI persistence, comsvcs dump.</li>
+        <li>Validated: YARA 4.x match + pySigma/sigma-cli clean convert to Splunk. MITRE-mapped.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>D4RKGUNN3R // BUILD &middot; ATTACK &middot; DETECT &middot; DOCUMENT</div>
+    <div><span class="y">authorized engagements only</span></div>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

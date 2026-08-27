@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>research // d4rkgunn3r</title>
+<meta name="description" content="Authorized bug bounty research — Vercel Sandbox network boundary.">
+<meta name="theme-color" content="#0b0e14">
+<meta name="author" content="Dylan Senez">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://dylans7j.github.io/portfolio/research.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="research // d4rkgunn3r">
+<meta property="og:description" content="Authorized bug bounty research — Vercel Sandbox network boundary.">
+<meta property="og:image" content="https://dylans7j.github.io/portfolio/og.png">
+<meta property="og:url" content="https://dylans7j.github.io/portfolio/research.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="status-strip" aria-hidden="true">
+    <span class="live">LINK UP</span>
+    <span class="sep">|</span>
+    <span id="clock">--:--:-- UTC</span>
+    <span class="sep">|</span>
+    <span>NODE // D4RK-01</span>
+    <span class="sep">|</span>
+    <span>SCOPE // AUTHORIZED ONLY</span>
+  </div>
+  <div class="topbar">
+    <h1><a href="index.html">Dylan Senez</a></h1>
+    <div class="handle">@<span>d4rkgunn3r</span></div>
+  </div>
+  <nav class="pills" aria-label="Primary">
+    <a href="index.html">home</a>
+    <a href="whoami.html">whoami</a>
+    <a href="tradecraft.html">tradecraft</a>
+    <a href="ops.html">ops</a>
+    <a href="research.html" class="active" aria-current="page">research</a>
+    <a href="certs.html">certs</a>
+    <a href="education.html">education</a>
+    <a href="write-ups.html">write-ups</a>
+    <a href="contact.html">contact</a>
+  </nav>
+  <section class="panel" aria-label="research">
+<div class="sec-bar">
+      <div class="sec-bar-left">
+        <div class="sec-label">RESEARCH <span class="slash">//</span> <span class="addr">0x00004000</span></div>
+        <h2 class="sec-h1">Authorized research</h2>
+      </div>
+      <span class="perm">r-x</span>
+    </div>
+    <div class="sec-sub">BUG BOUNTY & DISCLOSURE</div>
+    <p class="sec-lead">Security research under program scope. No overclaiming &mdash; live confirmation before report.</p>
+
+    <div class="card">
+      <div class="meta"><span class="tag">HACKERONE</span> &middot; vercel_sandbox &nbsp;&middot;&nbsp; <span style="color:var(--yellow)">IN PROGRESS</span></div>
+      <h3>Vercel Sandbox &mdash; Network Boundary Assessment</h3>
+      <p>Authorized research on the network boundary tier: egress firewall bypass &rarr; data exfiltration, and brokered credential retrieval.</p>
+      <ul>
+        <li>Modeled documented egress mechanics (SNI allowlist, IP/CIDR, transform domains) from the open-source SDK.</li>
+        <li>Derived <strong>10 candidate weaknesses (C1&ndash;C10)</strong>; three HIGH if confirmed live (UDP egress, DNS rebinding, SNI/IP decoupling + MITM).</li>
+        <li>Offline harness: firewall simulator (17/17 tests) + SNI probe (18/18, 14 ClientHello variants).</li>
+        <li>Live kit t01&ndash;t10 with control runs; H1 draft with CVSS ~8.2 for credential chain &mdash; pending live tenant confirmation.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="meta"><span class="tag">SCOPE</span> &middot; RULES OF ENGAGEMENT</div>
+      <h3>Authorized engagements only</h3>
+      <ul>
+        <li>Own tenant / own attacker infra only. Stop at proof.</li>
+        <li>No auto-exfil. Evidence truncated by design.</li>
+        <li>Model-derived findings are candidates until live-validated twice with controls.</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>D4RKGUNN3R // BUILD &middot; ATTACK &middot; DETECT &middot; DOCUMENT</div>
+    <div><span class="y">authorized engagements only</span></div>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
