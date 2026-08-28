@@ -9,7 +9,7 @@
   const expand = document.getElementById('hex-expand');
   const btn = document.getElementById('show-bytes');
   if (hexBg && expand && btn) {
-    const quote = 'I map the attack so the defenders can close it. Dylan Senez - Junior Pentester / SOC / Detection Engineer. Authorized engagements only. Build the lab. Attack the system. Collect the telemetry. Engineer the detection. Document the findings. Hand the blue team a precise map of how I got in and how to shut the door.';
+    const quote = 'I take the adversary\'s path and leave defenders a map of it. Dylan Senez - Junior Pentester / SOC / Detection Engineer. Authorized engagements only. Build the lab. Attack the system. Collect the telemetry. Engineer the detection. Document the findings. Hand the blue team a precise map of how I got in and how to shut the door.';
     let hex = '', offset = 0;
     for (let line = 0; line < 18; line++) {
       const addr = offset.toString(16).padStart(8, '0');
