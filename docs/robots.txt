@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://dylans7j.github.io/portfolio/sitemap.xml

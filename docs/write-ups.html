@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>write-ups // d4rkgunn3r</title>
+<meta name="description" content="Mapped regions — field guides, detection notes, HTB and lab write-ups.">
+<meta name="theme-color" content="#0b0e14">
+<meta name="author" content="Dylan Senez">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://dylans7j.github.io/portfolio/write-ups.html">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="write-ups // d4rkgunn3r">
+<meta property="og:description" content="Mapped regions — field guides, detection notes, HTB and lab write-ups.">
+<meta property="og:image" content="https://dylans7j.github.io/portfolio/og.png">
+<meta property="og:url" content="https://dylans7j.github.io/portfolio/write-ups.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="shell">
+  <div class="status-strip" aria-hidden="true">
+    <span class="live">LINK UP</span>
+    <span class="sep">|</span>
+    <span id="clock">--:--:-- UTC</span>
+    <span class="sep">|</span>
+    <span>NODE // D4RK-01</span>
+    <span class="sep">|</span>
+    <span>SCOPE // AUTHORIZED ONLY</span>
+  </div>
+  <div class="topbar">
+    <h1><a href="index.html">Dylan Senez</a></h1>
+    <div class="handle">@<span>d4rkgunn3r</span></div>
+  </div>
+  <nav class="pills" aria-label="Primary">
+    <a href="index.html">home</a>
+    <a href="whoami.html">whoami</a>
+    <a href="tradecraft.html">tradecraft</a>
+    <a href="ops.html">ops</a>
+    <a href="research.html">research</a>
+    <a href="certs.html">certs</a>
+    <a href="education.html">education</a>
+    <a href="write-ups.html" class="active" aria-current="page">write-ups</a>
+    <a href="contact.html">contact</a>
+  </nav>
+  <section class="panel" aria-label="write-ups">
+<div class="sec-bar">
+      <div class="sec-bar-left">
+        <div class="sec-label">WRITE-UPS &mdash; MEMORY REGIONS <span class="slash">//</span> <span class="addr">0x00007000</span></div>
+        <h2 class="sec-h1">Mapped regions</h2>
+      </div>
+      <span class="perm">r-x</span>
+    </div>
+
+    <div class="toggle-row">
+      <button type="button" class="active" id="btn-public" data-vault="public">PUBLIC REGIONS &nbsp;R-X</button>
+      <button type="button" id="btn-sealed" data-vault="sealed" title="Client / private notes stay offline">SEALED VAULT &nbsp;---</button>
+    </div>
+
+    <div id="vault-public">
+      <div class="filter-row" id="writeup-filters" role="tablist" aria-label="Filter write-ups">
+        <button type="button" class="active" data-filter="all">ALL <span class="n" id="n-all">0</span></button>
+        <button type="button" data-filter="dfir">.DFIR <span class="n" id="n-dfir">0</span></button>
+        <button type="button" data-filter="detection">.DETECTION <span class="n" id="n-detection">0</span></button>
+        <button type="button" data-filter="web">.WEB <span class="n" id="n-web">0</span></button>
+        <button type="button" data-filter="wifi">.WIFI <span class="n" id="n-wifi">0</span></button>
+        <button type="button" data-filter="ad">.AD <span class="n" id="n-ad">0</span></button>
+        <button type="button" data-filter="lab">.LAB <span class="n" id="n-lab">0</span></button>
+      </div>
+
+      <input type="search" class="search-box" id="writeup-search" placeholder="/grep regions/  e.g.  yara | sentinel | wifi | kerberoast" autocomplete="off" spellcheck="false">
+      <div class="region-count"><strong id="mapped-count">0</strong> regions mapped</div>
+
+      <div id="region-list">
+        <!-- groups injected / static below -->
+
+        <div class="region-group" data-group="dfir">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.DFIR</span>
+            <span class="cnt">3 REGIONS</span>
+          </div>
+          <article class="region-card" data-tags="dfir memory forensics volatility wannacry htb sherlock" data-cat="dfir">
+            <h3>vol_wannacry &mdash; Shadow Volume Deletion Tradecraft in Memory</h3>
+            <p>Volatility yara-scan of a compromised dump hitting ShadowVolumeDeletion across <code>@WanaDecryptor@</code> PIDs &mdash; <code>vssadmin delete shadows</code>, <code>bcdedit</code>, <code>wbadmin</code> recovery kill-chain recovered from process memory.</p>
+            <div class="tags"><span>volatility</span><span>yara</span><span>ransomware</span><span>htb</span></div>
+            <div class="links"><a href="ops.html">LAB NOTES ↗</a></div>
+          </article>
+          <article class="region-card" data-tags="dfir stego steganography field guide" data-cat="dfir">
+            <h3>stego_field_guide &mdash; Hide & Find Across Carriers</h3>
+            <p>Practical steganography / steganalysis reference: image, audio, video, text, and network carriers with working tool commands. Companion to the CSI Linux forensics guide.</p>
+            <div class="tags"><span>stego</span><span>forensics</span><span>field-guide</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noopener">OPEN GUIDE ↗</a></div>
+          </article>
+          <article class="region-card" data-tags="dfir csi linux forensics ios metadata" data-cat="dfir">
+            <h3>csi_linux_forensics &mdash; Analyst Distro Field Guide</h3>
+            <p>CSI Linux tooling map, iOS analysis, photo/metadata forensics, cryptography, and case-management workflows with working commands.</p>
+            <div class="tags"><span>csi-linux</span><span>dfir</span><span>osint</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noopener">OPEN GUIDE ↗</a></div>
+          </article>
+        </div>
+
+        <div class="region-group" data-group="detection">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.DETECTION</span>
+            <span class="cnt">2 REGIONS</span>
+          </div>
+          <article class="region-card" data-tags="detection yara sigma mimikatz cobalt strike rubeus sliver" data-cat="detection">
+            <h3>detection_rules &mdash; YARA + Sigma Library (15)</h3>
+            <p>Production-quality rules for credential dumping, C2, webshells, reverse shells, and AD attacks. Validated on YARA 4.x and pySigma/sigma-cli with clean Splunk conversion. MITRE-mapped.</p>
+            <div class="tags"><span>yara</span><span>sigma</span><span>mitre</span><span>soc</span></div>
+            <div class="links"><a href="ops.html">SEE OPS ↗</a></div>
+          </article>
+          <article class="region-card" data-tags="detection sentinel kql sysmon kerberoasting password spray ad" data-cat="detection">
+            <h3>sentinel_kql_lab &mdash; AD Attack Telemetry &rarr; Analytics Rules</h3>
+            <p>End-to-end purple-team loop: Kerberoasting / password spray in the AD lab, Sysmon + advanced audit telemetry into Microsoft Sentinel, KQL analytics rules validated against controlled activity.</p>
+            <div class="tags"><span>kql</span><span>sentinel</span><span>sysmon</span><span>ad</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener">OPEN LAB ↗</a></div>
+          </article>
+        </div>
+
+        <div class="region-group" data-group="web">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.WEB</span>
+            <span class="cnt">2 REGIONS</span>
+          </div>
+          <article class="region-card" data-tags="web xss sqli ssrf ffuf sqlmap burp" data-cat="web">
+            <h3>web_attacks_cheatsheet &mdash; Recon to Report Notes</h3>
+            <p>Topic sheets for XSS, SQLi, SSRF, command injection, server-side attacks, ffuf, and SQLmap &mdash; the notes used on labs and authorized testing.</p>
+            <div class="tags"><span>web</span><span>burp</span><span>ffuf</span><span>sqli</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noopener">OPEN SHEETS ↗</a></div>
+          </article>
+          <article class="region-card" data-tags="web bounty vercel sandbox sni dns rebinding egress h1" data-cat="web">
+            <h3>h1_vercel_sandbox &mdash; Network Boundary Candidates C1&ndash;C10</h3>
+            <p>Authorized HackerOne research: egress firewall modeling, SNI/IP decoupling, DNS rebinding, brokered credential path. Offline harness + live kit; report pending live confirmation.</p>
+            <div class="tags"><span>bug-bounty</span><span>h1</span><span>network</span><span>sni</span></div>
+            <div class="links"><a href="research.html">RESEARCH ↗</a></div>
+          </article>
+        </div>
+
+        <div class="region-group" data-group="wifi">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.WIFI</span>
+            <span class="cnt">1 REGION</span>
+          </div>
+          <article class="region-card" data-tags="wifi wireless aircrack airgeddon wpa2 wpa3 pmkid evil twin" data-cat="wifi">
+            <h3>wifi_pentest_field_guide &mdash; Full Edition</h3>
+            <p>802.11 security generations, aircrack-ng suite, handshake/PMKID/WPS/WEP, airgeddon, evil twins, WPA3, Enterprise EAP, client attacks, and Wi-Fi forensics &mdash; every section with working commands.</p>
+            <div class="tags"><span>wifi</span><span>aircrack</span><span>wpa3</span><span>field-guide</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noopener">OPEN GUIDE ↗</a></div>
+          </article>
+        </div>
+
+        <div class="region-group" data-group="ad">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.AD</span>
+            <span class="cnt">1 REGION</span>
+          </div>
+          <article class="region-card" data-tags="ad active directory kerberos bloodhound impacket kerberoasting dcsync" data-cat="ad">
+            <h3>ad_enumeration &mdash; Kerberos Paths & BloodHound Notes</h3>
+            <p>AD enum methodology, Kerberoasting, DCSync indicators, BloodHound/Impacket/NetExec workflows used in the home lab attack-to-detection cycle.</p>
+            <div class="tags"><span>ad</span><span>kerberos</span><span>bloodhound</span><span>impacket</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noopener">OPEN SHEETS ↗</a></div>
+          </article>
+        </div>
+
+        <div class="region-group" data-group="lab">
+          <div class="region-group-head">
+            <span class="perm-mini">r-x</span>
+            <span class="seg">SEGMENT</span>
+            <span class="ext">.LAB</span>
+            <span class="cnt">2 REGIONS</span>
+          </div>
+          <article class="region-card" data-tags="lab htb walkthroughs boxes methodology" data-cat="lab">
+            <h3>htb_walkthroughs &mdash; Structured Methodology Notes</h3>
+            <p>Documented penetration-testing methodology per solved box &mdash; recon &rarr; foothold &rarr; privesc &rarr; notes. Built to teach the path, not just the flag.</p>
+            <div class="tags"><span>htb</span><span>writeup</span><span>methodology</span></div>
+            <div class="links"><a href="https://github.com/Dylans7j/HackTheBox-Walkthroughs" target="_blank" rel="noopener">OPEN REPO ↗</a></div>
+          </article>
+          <article class="region-card" data-tags="lab soc sherlock investigation timeline" data-cat="lab">
+            <h3>sherlock_track &mdash; 6 Incident Investigations</h3>
+            <p>Full attack timeline reconstruction from authentication logs, Windows Event Logs, Sysmon, Linux logs, and network telemetry across six HTB Sherlock labs.</p>
+            <div class="tags"><span>sherlock</span><span>soc</span><span>timeline</span><span>htb</span></div>
+            <div class="links"><a href="ops.html">SEE OPS ↗</a></div>
+          </article>
+        </div>
+      </div>
+      <div class="empty-state" id="writeup-empty" hidden>0 regions matched filter.</div>
+    </div>
+
+    <div id="vault-sealed" hidden>
+      <div class="card">
+        <div class="meta"><span class="tag">SEALED</span> &middot; PERM ---</div>
+        <h3>Client / private notes stay offline</h3>
+        <p>Engagement reports, credentials, and non-public write-ups are not mapped into this address space. Authorized work only &mdash; nothing sensitive is published here.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>D4RKGUNN3R // BUILD &middot; ATTACK &middot; DETECT &middot; DOCUMENT</div>
+    <div><span class="y">authorized engagements only</span></div>
+  </footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
