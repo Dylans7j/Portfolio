@@ -460,3 +460,17 @@
     box-shadow: 0 0 0 1px rgba(245,197,24,0.15), 0 0 18px var(--yellow-glow);
   }
   .topbar h1 a { color: inherit; text-decoration: none; }
+
+  /* currently block */
+  .now-block { margin-top: 18px; border: 1px solid rgba(245,197,24,0.18); background: rgba(245,197,24,0.03); padding: 14px 16px; }
+  .now-label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; color: var(--yellow); margin-bottom: 8px; }
+  .now-list { list-style: none; margin: 0; padding: 0; }
+  .now-list li { font-size: 13.5px; color: var(--fg-dim); padding: 3px 0 3px 18px; position: relative; }
+  .now-list li::before { content: '»'; position: absolute; left: 0; color: var(--yellow); }
+  .now-list strong { color: var(--fg); }
+
+  /* cert progress bars */
+  .cert-row .prog { margin-top: 6px; height: 6px; background: rgba(255,255,255,0.08); position: relative; overflow: hidden; max-width: 320px; }
+  .cert-row .prog .fill { position: absolute; inset: 0 auto 0 0; background: var(--yellow); }
+  .cert-row .prog .fill.done { background: var(--green); }
+  .cert-row .pct { font-family: var(--mono); font-size: 10.5px; color: var(--fg-dim); margin-top: 4px; letter-spacing: 0.1em; }

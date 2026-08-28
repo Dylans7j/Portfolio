@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://dylans7j.github.io/portfolio/sitemap.xml
+Sitemap: https://dylans7j.github.io/Portfolio/sitemap.xml
