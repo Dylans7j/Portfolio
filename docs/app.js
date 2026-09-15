@@ -1,116 +1,306 @@
-(function () {
-  const clock = document.getElementById('clock');
-  if (clock) {
-    function tick() { clock.textContent = new Date().toISOString().slice(11, 19) + ' UTC'; }
-    tick(); setInterval(tick, 1000);
+const nodeData = {
+  kali: {
+    kind: "CONTROLLED ADVERSARY",
+    status: "Validated",
+    statusClass: "confirmed",
+    title: "Kali Linux",
+    summary: "Attack workstation used to generate controlled network and authentication activity inside the isolated lab.",
+    network: "VMnet7: 192.168.70.10",
+    evidence: "Nmap AD service discovery, NetExec SMB/LDAP testing, and Sentinel validation.",
+    tags: ["Nmap", "NetExec", "Linux"]
+  },
+  dc: {
+    kind: "IDENTITY CONTROL PLANE",
+    status: "Documented",
+    statusClass: "confirmed",
+    title: "DC-01",
+    summary: "Windows Server domain controller providing Active Directory Domain Services inside the host-only range.",
+    network: "VMnet7 host-only segment",
+    evidence: "AD DS configured, BadBlood test data seeded, and DNS, Kerberos, LDAP, SMB, and RPC services observed during scanning.",
+    tags: ["AD DS", "BadBlood", "Windows Server"]
+  },
+  win: {
+    kind: "DOMAIN ENDPOINT",
+    status: "Documented",
+    statusClass: "confirmed",
+    title: "WIN-01",
+    summary: "Windows endpoint used for domain-member configuration and endpoint telemetry work; the build log is documented through its setup sequence.",
+    network: "VMnet7 host-only segment",
+    evidence: "Endpoint build progress, Windows event analysis, and planned repeatable attack-to-detection exercises.",
+    tags: ["Windows", "Domain Member", "Event Logs"]
+  },
+  sysmon: {
+    kind: "ENDPOINT SENSOR",
+    status: "Active work",
+    statusClass: "confirmed",
+    title: "Sysmon",
+    summary: "High-value Windows telemetry layer used to make process, network, and persistence behavior easier to investigate.",
+    network: "Windows hosts → SIEM telemetry path",
+    evidence: "Process-creation analysis and parent-child correlation work; expanded coverage remains an active lab milestone.",
+    tags: ["Sysmon", "Process Trees", "Telemetry"]
+  },
+  splunk: {
+    kind: "SELF-HOSTED SIEM",
+    status: "Platform online",
+    statusClass: "confirmed",
+    title: "SPLUNK-01",
+    summary: "Ubuntu server running Splunk Enterprise as the lab’s self-hosted search and investigation platform.",
+    network: "VMware lab · web service on TCP 1137",
+    evidence: "Splunk Enterprise 10.4.2 installed, service running, and TCP reachability validated. Windows ingestion is staged next.",
+    tags: ["Splunk 10.4.2", "Ubuntu", "TCP 1137"]
+  },
+  sentinel: {
+    kind: "CLOUD SIEM",
+    status: "Receiving data",
+    statusClass: "confirmed",
+    title: "Microsoft Sentinel",
+    summary: "Cloud SIEM used for lab telemetry, KQL hunts, and alert-development practice.",
+    network: "Azure Monitor / data collection rule path",
+    evidence: "Azure Connected Machine Agent, DCR work, incoming data validation, custom KQL queries, and alert exercises.",
+    tags: ["Sentinel", "KQL", "Azure Monitor"]
   }
+};
 
-  const hexBg = document.getElementById('hex-bg');
-  const expand = document.getElementById('hex-expand');
-  const btn = document.getElementById('show-bytes');
-  if (hexBg && expand && btn) {
-    const quote = 'I take the adversary\'s path and leave defenders a map of it. Dylan Senez - Junior Pentester / SOC / Detection Engineer. Authorized engagements only. Build the lab. Attack the system. Collect the telemetry. Engineer the detection. Document the findings. Hand the blue team a precise map of how I got in and how to shut the door.';
-    let hex = '', offset = 0;
-    for (let line = 0; line < 18; line++) {
-      const addr = offset.toString(16).padStart(8, '0');
-      let bytes = '', ascii = '';
-      for (let i = 0; i < 16; i++) {
-        const ch = quote.charCodeAt((offset + i) % quote.length);
-        bytes += ch.toString(16).padStart(2, '0') + ' ';
-        ascii += (ch >= 32 && ch < 127) ? String.fromCharCode(ch) : '.';
-      }
-      hex += addr + '  ' + bytes + ' ' + ascii + '\n';
-      offset += 16;
-    }
-    hexBg.textContent = hex;
-    expand.textContent = hex;
-    btn.addEventListener('click', () => {
-      const open = expand.hidden;
-      expand.hidden = !open;
-      btn.textContent = open ? 'HIDE BYTES' : 'SHOW BYTES';
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-    });
+const cases = {
+  "ad-lab": {
+    kicker: "CASE 01 · ACTIVE DIRECTORY + SOC",
+    title: "SOC–Active Directory Lab",
+    deck: "A segmented VMware environment built to connect adversary behavior with identity and endpoint evidence, then investigate the results in multiple SIEM workflows.",
+    facts: [["Environment", "VMware"], ["Range", "Isolated"], ["Focus", "Attack → evidence"]],
+    method: [
+      "Isolated Active Directory lab traffic on the VMnet7 host-only network.",
+      "Configured DC-01 with AD DS and seeded realistic directory objects using BadBlood.",
+      "Used Kali to enumerate exposed AD services and generate controlled test activity.",
+      "Validated telemetry in Sentinel and established SPLUNK-01 as a second analysis platform."
+    ],
+    evidence: [
+      "Kali connected to the VMnet7 lab at 192.168.70.10/24.",
+      "Observed ports 53, 88, 135, 139, 389, and 445 on the domain controller during service discovery.",
+      "Sentinel data and custom KQL work documented; Splunk service reachability independently checked.",
+      "CrowdSec was removed from the current design and is not presented as deployed."
+    ],
+    next: "Complete a repeatable attack matrix with saved telemetry, screenshots, queries, and report-ready findings for each scenario."
+  },
+  "kql-hunts": {
+    kicker: "CASE 02 · DETECTION ENGINEERING",
+    title: "KQL Detection & Hunt Pack",
+    deck: "A growing set of focused queries intended to shorten the path from Windows evidence to a defensible investigative answer.",
+    facts: [["Language", "KQL"], ["Platform", "Sentinel"], ["State", "Active work"]],
+    method: [
+      "Start broad with time, host, user, and event constraints.",
+      "Normalize process names, parent processes, command lines, and account context.",
+      "Pivot on suspicious relationships and corroborate across adjacent events.",
+      "Record what the data proves separately from analyst inference."
+    ],
+    evidence: [
+      "Custom Sentinel queries created during lab validation.",
+      "Process-creation and parent-child investigation patterns used in Windows event exercises.",
+      "Alert-development work tied to incoming lab data rather than static examples alone."
+    ],
+    next: "Package each query with purpose, required tables, known limitations, test data, and an expected result screenshot before GitHub publication."
+  },
+  "event-4688": {
+    kicker: "CASE 03 · WINDOWS FORENSICS",
+    title: "Event 4688 Process Investigation",
+    deck: "A Windows Security log exercise focused on reconstructing process ancestry around C2 beaconing while keeping observed facts distinct from attribution.",
+    facts: [["Source", "Security.evtx"], ["Event", "4688"], ["Protocol", "TCP"]],
+    method: [
+      "Filtered process-creation events around the relevant time window.",
+      "Compared NewProcessName, ParentProcessName, user context, and process identifiers.",
+      "Followed candidate chains instead of stopping at the first suspicious executable.",
+      "Used the network clue—TCP—as corroboration, not proof of a specific malware family."
+    ],
+    evidence: [
+      "Event data included taskhostw.exe created beneath svchost.exe.",
+      "Additional 4688 review surfaced WMIADAP.exe for correlation.",
+      "The exercise answer identified TCP as the C2 protocol.",
+      "No malware attribution is claimed from those process names alone."
+    ],
+    next: "Add process-ID correlation across Sysmon network events and Windows Security events to produce a complete timestamped process-to-connection chain."
+  },
+  "splunk-build": {
+    kicker: "CASE 04 · SIEM ENGINEERING",
+    title: "Splunk SIEM Build",
+    deck: "A self-hosted Splunk deployment that adds a second investigation workflow to the lab without overstating data onboarding progress.",
+    facts: [["Host", "SPLUNK-01"], ["OS", "Ubuntu"], ["Version", "10.4.2"]],
+    method: [
+      "Installed the Linux AMD64 Splunk Enterprise package on Ubuntu.",
+      "Started the service and validated the configured web endpoint.",
+      "Confirmed TCP connectivity to the lab-specific service port.",
+      "Separated platform availability from the still-staged ingestion milestone."
+    ],
+    evidence: [
+      "Splunk Enterprise package: 10.4.2-33c3bf42cd73.",
+      "Service is running and the TCP test returned reachable.",
+      "The lab web interface is configured on TCP 1137.",
+      "No claim is made here that Windows forwarder ingestion is complete."
+    ],
+    next: "Onboard DC-01 and WIN-01 with a Universal Forwarder, verify sourcetypes, then reproduce one Sentinel investigation in SPL."
+  },
+  "ip-changer": {
+    kicker: "PROJECT 05 · RELATED TOOLING",
+    title: "Kali IP Changer",
+    deck: "A separately tracked privacy-tooling idea for controlled routing through a proxy or Tor. It is not a component of the SOC telemetry architecture.",
+    facts: [["Platform", "Kali"], ["Format", "Bash"], ["State", "Draft"]],
+    method: [
+      "Define explicit direct, proxy, and Tor modes.",
+      "Verify routing state before and after each change.",
+      "Fail closed when dependencies or connectivity checks do not pass.",
+      "Keep the tool separate from lab evidence-generation scripts."
+    ],
+    evidence: [
+      "Project requirements were defined for Kali and GitHub packaging.",
+      "Proxy or Tor routing was selected as the direction.",
+      "This portfolio labels it as a draft because publication is not verified."
+    ],
+    next: "Finish validation, add rollback handling and transparent limitations, then publish only after verifying repository state."
+  },
+  cs499: {
+    kicker: "PROJECT 06 · SOFTWARE ENGINEERING",
+    title: "CS 499 ePortfolio",
+    deck: "A completed academic portfolio showing the ability to review code, enhance artifacts, and explain engineering decisions in writing.",
+    facts: [["Program", "Computer Science"], ["State", "Published"], ["Host", "GitHub"]],
+    method: [
+      "Performed a code review before enhancement work.",
+      "Organized artifacts and supporting narratives.",
+      "Connected technical changes to outcomes and course objectives.",
+      "Closed with a self-assessment of the complete portfolio."
+    ],
+    evidence: [
+      "Public repository is available under the Dylans7j GitHub account.",
+      "Repository includes code review, artifacts, narratives, and self-assessment material.",
+      "Completion was documented in July 2026."
+    ],
+    next: "Cross-link the strongest software engineering artifact with a security-focused project that demonstrates telemetry, investigation, and reporting.",
+    link: "https://github.com/Dylans7j/CS499-ePortfolio"
   }
+};
 
-  const cards = [...document.querySelectorAll('.region-card')];
-  if (cards.length) {
-    const groups = [...document.querySelectorAll('.region-group')];
-    const filters = [...document.querySelectorAll('#writeup-filters button')];
-    const search = document.getElementById('writeup-search');
-    const mappedCount = document.getElementById('mapped-count');
-    const empty = document.getElementById('writeup-empty');
-    let activeFilter = 'all';
+const nodes = [...document.querySelectorAll(".node")];
+const links = [...document.querySelectorAll(".link")];
+const inspector = {
+  kind: document.querySelector("#inspectorKind"),
+  status: document.querySelector("#inspectorStatus"),
+  title: document.querySelector("#inspectorTitle"),
+  summary: document.querySelector("#inspectorSummary"),
+  network: document.querySelector("#inspectorNetwork"),
+  evidence: document.querySelector("#inspectorEvidence"),
+  tags: document.querySelector("#inspectorTags")
+};
 
-    function countByCat() {
-      const counts = { all: cards.length, dfir:0, detection:0, web:0, wifi:0, ad:0, lab:0 };
-      cards.forEach(c => { counts[c.dataset.cat] = (counts[c.dataset.cat] || 0) + 1; });
-      Object.keys(counts).forEach(k => {
-        const el = document.getElementById('n-' + k);
-        if (el) el.textContent = counts[k];
-      });
-    }
-    function applyFilter() {
-      const q = (search && search.value || '').trim().toLowerCase();
-      let shown = 0;
-      cards.forEach(c => {
-        const catOk = activeFilter === 'all' || c.dataset.cat === activeFilter;
-        const hay = ((c.dataset.tags || '') + ' ' + c.textContent).toLowerCase();
-        const qOk = !q || hay.includes(q);
-        const on = catOk && qOk;
-        c.classList.toggle('hidden', !on);
-        if (on) shown++;
-      });
-      groups.forEach(g => {
-        const any = [...g.querySelectorAll('.region-card')].some(c => !c.classList.contains('hidden'));
-        g.classList.toggle('hidden', !any);
-        const cnt = g.querySelector('.cnt');
-        if (cnt) {
-          const n = [...g.querySelectorAll('.region-card')].filter(c => !c.classList.contains('hidden')).length;
-          cnt.textContent = n + ' REGION' + (n === 1 ? '' : 'S');
-        }
-      });
-      if (mappedCount) mappedCount.textContent = String(shown);
-      if (empty) empty.hidden = shown > 0;
-    }
-    filters.forEach(b => b.addEventListener('click', () => {
-      activeFilter = b.dataset.filter;
-      filters.forEach(x => x.classList.toggle('active', x === b));
-      applyFilter();
-    }));
-    if (search) search.addEventListener('input', applyFilter);
-    countByCat();
-    applyFilter();
+function selectNode(key) {
+  const data = nodeData[key];
+  if (!data) return;
 
-    const btnPublic = document.getElementById('btn-public');
-    const btnSealed = document.getElementById('btn-sealed');
-    const vaultPublic = document.getElementById('vault-public');
-    const vaultSealed = document.getElementById('vault-sealed');
-    if (btnPublic && btnSealed) {
-      btnPublic.addEventListener('click', () => {
-        btnPublic.classList.add('active'); btnSealed.classList.remove('active');
-        vaultPublic.hidden = false; vaultSealed.hidden = true;
-      });
-      btnSealed.addEventListener('click', () => {
-        btnSealed.classList.add('active'); btnPublic.classList.remove('active');
-        vaultPublic.hidden = true; vaultSealed.hidden = false;
-      });
-    }
+  nodes.forEach(node => {
+    const selected = node.dataset.node === key;
+    node.classList.toggle("active", selected);
+    node.classList.toggle("dim", !selected && !links.some(link => link.dataset.link.split(" ").includes(key) && link.dataset.link.split(" ").includes(node.dataset.node)));
+    node.setAttribute("aria-pressed", String(selected));
+  });
+
+  links.forEach(link => {
+    const related = link.dataset.link.split(" ").includes(key);
+    link.classList.toggle("highlight", related);
+    link.classList.toggle("dim", !related);
+  });
+
+  inspector.kind.textContent = data.kind;
+  inspector.status.textContent = data.status;
+  inspector.status.className = `status ${data.statusClass}`;
+  inspector.title.textContent = data.title;
+  inspector.summary.textContent = data.summary;
+  inspector.network.textContent = data.network;
+  inspector.evidence.textContent = data.evidence;
+  inspector.tags.replaceChildren(...data.tags.map(tag => {
+    const span = document.createElement("span");
+    span.textContent = tag;
+    return span;
+  }));
+}
+
+nodes.forEach(node => node.addEventListener("click", () => selectNode(node.dataset.node)));
+document.querySelector("#resetTopology").addEventListener("click", () => {
+  nodes.forEach(node => node.classList.remove("dim"));
+  links.forEach(link => link.classList.remove("dim", "highlight"));
+  selectNode("kali");
+});
+
+const filters = [...document.querySelectorAll(".filter")];
+const projects = [...document.querySelectorAll(".project")];
+filters.forEach(filter => filter.addEventListener("click", () => {
+  const value = filter.dataset.filter;
+  filters.forEach(button => {
+    const active = button === filter;
+    button.classList.toggle("active", active);
+    button.setAttribute("aria-pressed", String(active));
+  });
+  projects.forEach(project => {
+    project.hidden = value !== "all" && !project.dataset.tech.split(" ").includes(value);
+  });
+}));
+
+const dialog = document.querySelector("#caseDialog");
+const caseTitle = document.querySelector("#caseTitle");
+const caseKicker = document.querySelector("#caseKicker");
+const caseDeck = document.querySelector("#caseDeck");
+const caseFacts = document.querySelector("#caseFacts");
+const caseMethod = document.querySelector("#caseMethod");
+const caseEvidence = document.querySelector("#caseEvidence");
+const caseNext = document.querySelector("#caseNext");
+const caseLink = document.querySelector("#caseLink");
+
+function listItems(items) {
+  return items.map(item => {
+    const li = document.createElement("li");
+    li.textContent = item;
+    return li;
+  });
+}
+
+function openCase(key) {
+  const data = cases[key];
+  if (!data) return;
+  caseKicker.textContent = data.kicker;
+  caseTitle.textContent = data.title;
+  caseDeck.textContent = data.deck;
+  caseFacts.replaceChildren(...data.facts.map(([label, value]) => {
+    const div = document.createElement("div");
+    const span = document.createElement("span");
+    const bold = document.createElement("b");
+    span.textContent = label;
+    bold.textContent = value;
+    div.append(span, bold);
+    return div;
+  }));
+  caseMethod.replaceChildren(...listItems(data.method));
+  caseEvidence.replaceChildren(...listItems(data.evidence));
+  caseNext.textContent = data.next;
+  if (data.link) {
+    caseLink.href = data.link;
+    caseLink.classList.remove("hidden");
+  } else {
+    caseLink.classList.add("hidden");
   }
+  dialog.showModal();
+}
 
-  const pages = ['index.html','whoami.html','tradecraft.html','ops.html','research.html','certs.html','education.html','write-ups.html','contact.html'];
-  const file = (location.pathname.split('/').pop() || 'index.html');
-  let idx = pages.indexOf(file);
-  if (idx < 0 && (file === '' || file === '/')) idx = 0;
-  document.addEventListener('keydown', (e) => {
-    if (e.target.matches('input, textarea, select')) return;
-    if (idx < 0) return;
-    if (e.key === 'ArrowRight' || e.key === 'l') location.href = pages[(idx + 1) % pages.length];
-    else if (e.key === 'ArrowLeft' || e.key === 'h') location.href = pages[(idx - 1 + pages.length) % pages.length];
-    else if (e.key >= '1' && e.key <= '9') {
-      const n = parseInt(e.key, 10) - 1;
-      if (pages[n]) location.href = pages[n];
-    } else if (e.key === '?') {
-      alert('Nav: 1-9 jump pages | ←/→ or h/l cycle');
+projects.forEach(project => project.querySelector(".case-button").addEventListener("click", () => openCase(project.dataset.case)));
+document.querySelector("#closeDialog").addEventListener("click", () => dialog.close());
+dialog.addEventListener("click", event => {
+  const bounds = dialog.getBoundingClientRect();
+  const outside = event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom;
+  if (outside) dialog.close();
+});
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add("visible");
+      observer.unobserve(entry.target);
     }
   });
-})();
+}, { threshold: 0.08 });
+document.querySelectorAll(".reveal").forEach(element => observer.observe(element));
+
+selectNode("kali");
