@@ -4,19 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ops // d4rkgunn3r</title>
-<meta name="description" content="SOC / AD home lab, HTB investigations, YARA and Sigma detection rules.">
+<meta name="description" content="Evidence-based SOC and Active Directory lab work, HTB investigations, and detection-rule research.">
 <meta name="theme-color" content="#0b0e14">
 <meta name="author" content="Dylan Senez">
 <meta name="robots" content="index,follow">
-<link rel="canonical" href="https://dylans7j.github.io/portfolio/ops.html">
+<link rel="canonical" href="https://dylans7j.github.io/Portfolio/ops.html">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon-32.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ops // d4rkgunn3r">
-<meta property="og:description" content="SOC / AD home lab, HTB investigations, YARA and Sigma detection rules.">
-<meta property="og:image" content="https://dylans7j.github.io/portfolio/og.png">
-<meta property="og:url" content="https://dylans7j.github.io/portfolio/ops.html">
+<meta property="og:description" content="Evidence-based SOC and Active Directory lab work, HTB investigations, and detection-rule research.">
+<meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png">
+<meta property="og:url" content="https://dylans7j.github.io/Portfolio/ops.html">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -58,7 +58,7 @@
       <span class="perm">rwx</span>
     </div>
     <div class="sec-sub">ATTACK &middot; DETECT &middot; DOCUMENT</div>
-    <p class="sec-lead">Isolated enterprise lab built to attack, detect, and document end-to-end.</p>
+    <p class="sec-lead">Isolated SOC and Active Directory home lab used to generate activity, inspect telemetry, and document reproducible findings.</p>
 
     <div class="card">
       <div class="meta"><span class="tag">LAB</span> &middot; ENTERPRISE SOC / AD</div>
@@ -66,7 +66,7 @@
       <ul>
         <li>VMware lab: Windows Server DC, Win10/11 clients, Kali, Azure, Microsoft Sentinel.</li>
         <li>AD DS, Group Policy, DNS, domain join; Sysmon + PowerShell logging + advanced audit policy.</li>
-        <li>Azure Monitor Agent + Data Collection Rules &rarr; Sentinel; KQL rules validated against Kerberoasting and password spraying.</li>
+        <li>Azure Monitor Agent + Data Collection Rules &rarr; Sentinel; KQL detections are documented with their current test status and next validation step.</li>
         <li>Six-question doc standard per scenario: built &rarr; tested &rarr; evidence &rarr; detection &rarr; remediation.</li>
       </ul>
       <p style="margin-top:10px"><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener">OPEN REPO ↗</a></p>
@@ -75,18 +75,18 @@
       <div class="meta"><span class="tag">HTB</span> &middot; BLUE TEAM TRACK</div>
       <h3>Incident investigation & memory forensics</h3>
       <ul>
-        <li>6 Sherlock labs &mdash; full attack timelines from auth logs, Event Logs, Sysmon, Linux logs, network telemetry.</li>
+        <li>HTB Sherlock investigations using authentication logs, Windows Event Logs, Sysmon, Linux logs, and network telemetry.</li>
         <li>Volatility WannaCry analysis &mdash; yara-scanned dumps for shadow-volume-deletion tradecraft across <code>@WanaDecryptor@</code>.</li>
-        <li>Splunk + Elastic lab stacks; 100+ machine attack-path research.</li>
+        <li>Splunk and Elastic lab work paired with documented attack-path research.</li>
       </ul>
     </div>
     <div class="card">
       <div class="meta"><span class="tag">DETECTION</span> &middot; RULE LIBRARY</div>
-      <h3>YARA + Sigma &mdash; 15 validated rules</h3>
+      <h3>YARA + Sigma rule research</h3>
       <ul>
-        <li>YARA: Mimikatz, Cobalt Strike, PHP webshells, Rubeus, Sliver, reverse shells, UPX.</li>
+        <li>Rule topics include credential access, command-and-control tooling, webshells, reverse shells, and packed executables.</li>
         <li>Sigma: LSASS access, PS cradles, Kerberoasting, DCSync, web-spawn-shell, certutil LOLBin, WMI persistence, comsvcs dump.</li>
-        <li>Validated: YARA 4.x match + pySigma/sigma-cli clean convert to Splunk. MITRE-mapped.</li>
+        <li>Each public rule should pair MITRE ATT&amp;CK mapping with sanitized test evidence and a clearly stated validation status.</li>
       </ul>
     </div>
   </section>
