@@ -79,7 +79,8 @@ const cases = {
       "Sentinel data and custom KQL work documented; Splunk service reachability independently checked.",
       "CrowdSec was removed from the current design and is not presented as deployed."
     ],
-    next: "Complete a repeatable attack matrix with saved telemetry, screenshots, queries, and report-ready findings for each scenario."
+    next: "Complete a repeatable attack matrix with saved telemetry, screenshots, queries, and report-ready findings for each scenario.",
+    link: "https://github.com/Dylans7j/SOC-Lab"
   },
   "kql-hunts": {
     kicker: "CASE 02 · DETECTION ENGINEERING",
@@ -97,7 +98,8 @@ const cases = {
       "Process-creation and parent-child investigation patterns used in Windows event exercises.",
       "Alert-development work tied to incoming lab data rather than static examples alone."
     ],
-    next: "Package each query with purpose, required tables, known limitations, test data, and an expected result screenshot before GitHub publication."
+    next: "Package each query with purpose, required tables, known limitations, test data, and an expected result screenshot.",
+    link: "https://github.com/Dylans7j/SOC-Lab/tree/main/detections"
   },
   "event-4688": {
     kicker: "CASE 03 · WINDOWS FORENSICS",
@@ -135,25 +137,27 @@ const cases = {
       "The lab web interface is configured on TCP 1137.",
       "No claim is made here that Windows forwarder ingestion is complete."
     ],
-    next: "Onboard DC-01 and WIN-01 with a Universal Forwarder, verify sourcetypes, then reproduce one Sentinel investigation in SPL."
+    next: "Onboard DC-01 and WIN-01 with a Universal Forwarder, verify sourcetypes, then reproduce one Sentinel investigation in SPL.",
+    link: "https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem"
   },
-  "ip-changer": {
-    kicker: "PROJECT 05 · RELATED TOOLING",
-    title: "Kali IP Changer",
-    deck: "A separately tracked privacy-tooling idea for controlled routing through a proxy or Tor. It is not a component of the SOC telemetry architecture.",
-    facts: [["Platform", "Kali"], ["Format", "Bash"], ["State", "Draft"]],
+  "llmnr-poisoning": {
+    kicker: "CASE 05 · ATTACK TO DETECTION",
+    title: "LLMNR/NBT-NS Poisoning Investigation",
+    deck: "A controlled Active Directory scenario documenting how name-resolution poisoning creates credential exposure and how defenders can identify and reduce the risk.",
+    facts: [["Tool", "Responder"], ["Environment", "Isolated AD lab"], ["State", "Documented"]],
     method: [
-      "Define explicit direct, proxy, and Tor modes.",
-      "Verify routing state before and after each change.",
-      "Fail closed when dependencies or connectivity checks do not pass.",
-      "Keep the tool separate from lab evidence-generation scripts."
+      "Generated controlled LLMNR/NBT-NS poisoning activity from Kali inside the isolated lab.",
+      "Documented the attack path and the Windows and network evidence available to defenders.",
+      "Mapped the behavior to MITRE ATT&CK and separated observed evidence from expected indicators.",
+      "Recorded protocol-hardening, segmentation, and credential-protection recommendations."
     ],
     evidence: [
-      "Project requirements were defined for Kali and GitHub packaging.",
-      "Proxy or Tor routing was selected as the direction.",
-      "This portfolio labels it as a draft because publication is not verified."
+      "The complete scenario is published in the SOC-Lab repository.",
+      "The write-up preserves the controlled commands and relevant detection opportunities.",
+      "Remediation focuses on disabling legacy name-resolution protocols where feasible and reducing credential exposure."
     ],
-    next: "Finish validation, add rollback handling and transparent limitations, then publish only after verifying repository state."
+    next: "Add a tested KQL/SPL detection with an expected-result screenshot and documented false-positive considerations.",
+    link: "https://github.com/Dylans7j/SOC-Lab/blob/main/attack-scenarios/llmnr-nbtns-poisoning.md"
   },
   cs499: {
     kicker: "PROJECT 06 · SOFTWARE ENGINEERING",
