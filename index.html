@@ -27,7 +27,7 @@
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Dylan Senez SOC Lab home">
         <span class="brand-mark" aria-hidden="true">DS</span>
-        <span>D4RKGUNN3R</span>
+        <span>Dylan Senez <small>/ D4RKGUNN3R</small></span>
       </a>
       <nav aria-label="Primary navigation">
         <a href="#profile">Profile</a>
@@ -49,9 +49,14 @@
             incident investigation, detection engineering, and authorized penetration testing.
             My work connects controlled attacks to defensible evidence and clear reporting.
           </p>
+          <p class="role-line">SOC ANALYST <span>·</span> INCIDENT RESPONSE <span>·</span> DFIR</p>
           <div class="hero-actions">
-            <a class="button primary" href="#architecture">
-              Explore my work
+            <a class="button primary" href="#evidence">
+              View SOC/DFIR projects
+              <span aria-hidden="true">↓</span>
+            </a>
+            <a class="button secondary" href="./Dylan_Senez_Public_Resume.pdf" download>
+              Download résumé
               <span aria-hidden="true">↓</span>
             </a>
             <a class="button secondary" href="https://github.com/Dylans7j" target="_blank" rel="noreferrer">
@@ -78,7 +83,7 @@
 
         <div class="signal-strip reveal" aria-label="Lab highlights">
           <div><strong>CJCA</strong><span>HTB certified associate</span></div>
-          <div><strong>02</strong><span>SIEM platforms online</span></div>
+          <div><strong>02</strong><span>dual-SIEM lab workflows</span></div>
           <div><strong>AD</strong><span>attack + detection lab</span></div>
           <div><strong>DFIR</strong><span>evidence-driven investigations</span></div>
         </div>
@@ -226,8 +231,9 @@
             <div class="project-state verified">Documented build</div>
             <h3>SOC–Active Directory Lab</h3>
             <p>An isolated VMware range connecting identity, endpoint telemetry, controlled adversary activity, and cloud detection.</p>
+            <p class="project-outcome"><b>Outcome:</b> Connected controlled AD activity to Windows telemetry and repeatable Sentinel investigations.</p>
             <div class="tech-list"><span>Active Directory</span><span>Sentinel</span><span>Kali</span><span>Sysmon</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noreferrer">Evidence ↗</a></div>
           </article>
 
           <article class="project" data-tech="sentinel kql sysmon" data-case="kql-hunts">
@@ -235,8 +241,9 @@
             <div class="project-state active-build">Active work</div>
             <h3>KQL Detection & Hunt Pack</h3>
             <p>Reusable queries for process creation, authentication activity, suspicious parent-child relationships, and lab validation.</p>
+            <p class="project-outcome"><b>Outcome:</b> Published reusable KQL and SPL detections with evidence-focused investigation guidance.</p>
             <div class="tech-list"><span>KQL</span><span>Sentinel</span><span>Windows Events</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/detections" target="_blank" rel="noreferrer">Queries ↗</a></div>
           </article>
 
           <article class="project" data-tech="sysmon kql sentinel" data-case="event-4688">
@@ -244,6 +251,7 @@
             <div class="project-state verified">Completed exercise</div>
             <h3>Windows Event 4688 Investigation</h3>
             <p>Process-chain analysis using Security event data to investigate TCP beaconing without over-claiming attribution.</p>
+            <p class="project-outcome"><b>Outcome:</b> Reconstructed process ancestry while keeping observed facts separate from attribution.</p>
             <div class="tech-list"><span>Event ID 4688</span><span>Process Trees</span><span>TCP</span></div>
             <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
           </article>
@@ -253,17 +261,19 @@
             <div class="project-state verified">Platform online</div>
             <h3>Splunk SIEM Build</h3>
             <p>Splunk Enterprise deployed on Ubuntu with service reachability validated; Windows ingestion is the next documented milestone.</p>
+            <p class="project-outcome"><b>Outcome:</b> Established the second analysis platform and documented the remaining ingestion milestone.</p>
             <div class="tech-list"><span>Splunk 10.4.2</span><span>Ubuntu</span><span>TCP 1137</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem" target="_blank" rel="noreferrer">Build notes ↗</a></div>
           </article>
 
-          <article class="project" data-tech="kali github" data-case="ip-changer">
-            <div class="project-index">PROJECT 05</div>
-            <div class="project-state staged">Portfolio draft</div>
-            <h3>Kali IP Changer</h3>
-            <p>A related privacy-tooling concept for controlled proxy or Tor routing, tracked separately from the core SOC lab.</p>
-            <div class="tech-list"><span>Kali</span><span>Bash</span><span>GitHub draft</span></div>
-            <button class="case-button" type="button">Open details <span aria-hidden="true">↗</span></button>
+          <article class="project" data-tech="active-directory kali sysmon sentinel github" data-case="llmnr-poisoning">
+            <div class="project-index">CASE 05</div>
+            <div class="project-state verified">Documented investigation</div>
+            <h3>LLMNR/NBT-NS Poisoning</h3>
+            <p>Controlled Responder activity mapped from attack execution through Windows evidence, detection opportunities, and remediation.</p>
+            <p class="project-outcome"><b>Outcome:</b> Turned a credential-poisoning scenario into defensible evidence, detections, and mitigations.</p>
+            <div class="tech-list"><span>Responder</span><span>Active Directory</span><span>MITRE ATT&amp;CK</span></div>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/blob/main/attack-scenarios/llmnr-nbtns-poisoning.md" target="_blank" rel="noreferrer">Evidence ↗</a></div>
           </article>
 
           <article class="project" data-tech="github" data-case="cs499">
@@ -271,6 +281,7 @@
             <div class="project-state verified">Published repository</div>
             <h3>CS 499 ePortfolio</h3>
             <p>A completed software engineering portfolio containing code review, enhanced artifacts, narratives, and a self-assessment.</p>
+            <p class="project-outcome"><b>Outcome:</b> Demonstrated structured code review, iterative engineering, and technical communication.</p>
             <div class="tech-list"><span>GitHub</span><span>Code Review</span><span>Engineering</span></div>
             <div class="project-actions">
               <button class="case-button" type="button">Open details <span aria-hidden="true">↗</span></button>
@@ -314,7 +325,7 @@
           <div><span class="credential-code">CDSA</span><div><strong>SOC Analyst Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
           <div><span class="credential-code">CPTS</span><div><strong>Penetration Tester Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
           <div><span class="credential-code">CWES</span><div><strong>Web Penetration Tester Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
-          <div><span class="credential-code">SEC+</span><div><strong>CompTIA Security+ Preparation</strong><small>Enrolled · 12.9% complete</small></div><i>ACTIVE</i></div>
+          <div><span class="credential-code">SEC+</span><div><strong>CompTIA Security+ Preparation</strong><small>In progress</small></div><i>ACTIVE</i></div>
           <div><span class="credential-code">B.S.</span><div><strong>Computer Science — Information Security</strong><small>Southern New Hampshire University · Completed</small></div><i>DEGREE</i></div>
           <div><span class="credential-code">USCG</span><div><strong>U.S. Coast Guard Veteran</strong><small>Six years of service · Gunner’s Mate Second Class</small></div><i>SERVICE</i></div>
         </div>
@@ -323,7 +334,7 @@
       <section class="section contact-section" id="contact" aria-labelledby="contact-title">
         <div class="contact-panel reveal">
           <div><p class="eyebrow">06 / CONTACT</p><h2 id="contact-title">Let’s connect.</h2><p>Open to SOC analyst, incident response, detection engineering, and junior penetration-testing opportunities.</p></div>
-          <div class="contact-links"><a href="https://github.com/Dylans7j" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/Dylans7j ↗</b></a><a href="https://www.linkedin.com/in/dylan-s-371496275" target="_blank" rel="noreferrer"><span>LinkedIn</span><b>Connect with Dylan ↗</b></a></div>
+          <div class="contact-links"><a href="mailto:dylan.senez@outlook.com"><span>Email</span><b>dylan.senez@outlook.com ↗</b></a><a href="https://github.com/Dylans7j" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/Dylans7j ↗</b></a><a href="https://www.linkedin.com/in/dylan-s-371496275" target="_blank" rel="noreferrer"><span>LinkedIn</span><b>Connect with Dylan ↗</b></a></div>
         </div>
       </section>
     </main>
