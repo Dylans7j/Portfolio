@@ -290,7 +290,7 @@ footer .brand-mark { width: 28px; height: 28px; font-size: 9px; }
 .case-dialog .button { margin-top: 26px; }
 .hidden { display: none !important; }
 
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity .7s ease, transform .7s ease; }
+.reveal { opacity: 1; transform: none; transition: none; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
 
 @media (max-width: 940px) {
