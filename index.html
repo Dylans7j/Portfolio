@@ -32,7 +32,8 @@
       <nav aria-label="Primary navigation">
         <a href="#profile">Profile</a>
         <a href="#architecture">Lab</a>
-        <a href="#evidence">Projects</a>
+        <a href="#evidence">Featured work</a>
+        <a href="./projects.html">Projects</a>
         <a href="#credentials">Credentials</a>
         <a href="#contact">Contact</a>
       </nav>
@@ -83,8 +84,8 @@
 
         <div class="signal-strip reveal" aria-label="Lab highlights">
           <div><strong>CJCA</strong><span>HTB certified associate</span></div>
-          <div><strong>02</strong><span>dual-SIEM lab workflows</span></div>
-          <div><strong>AD</strong><span>attack + detection lab</span></div>
+          <div><strong>04</strong><span>WIN11 log channels in Splunk</span></div>
+          <div><strong>AD</strong><span>isolated lab + ongoing detection work</span></div>
           <div><strong>DFIR</strong><span>evidence-driven investigations</span></div>
         </div>
       </section>
@@ -130,7 +131,7 @@
             <p class="eyebrow">02 / LAB ARCHITECTURE</p>
             <h2 id="architecture-title">Follow the signal.</h2>
           </div>
-          <p>Select a system to inspect its role, current state, and the evidence produced there.</p>
+          <p>Select a system to inspect its role and documented evidence. WIN11 Splunk ingestion is verified; WIN11 Sentinel onboarding is deferred.</p>
         </div>
 
         <div class="architecture-grid reveal">
@@ -211,7 +212,7 @@
             <p class="eyebrow">03 / EVIDENCE & PROJECTS</p>
             <h2 id="evidence-title">Work you can inspect.</h2>
           </div>
-          <p>Filter by technology, then open a concise case study for the objective, method, evidence, and next iteration.</p>
+          <p>Explore verified telemetry and documented investigations. <a href="./projects.html">See full project case studies and GitHub source ↗</a></p>
         </div>
 
         <div class="filter-bar reveal" role="toolbar" aria-label="Filter projects by technology">
@@ -226,13 +227,13 @@
         </div>
 
         <div class="project-grid reveal" id="projectGrid">
-          <article class="project featured" data-tech="active-directory sentinel sysmon kali kql github" data-case="ad-lab">
+          <article class="project featured" data-tech="active-directory sysmon kali splunk github" data-case="ad-lab">
             <div class="project-index">CASE 01</div>
-            <div class="project-state verified">Documented build</div>
+            <div class="project-state active-build">In progress · telemetry verified</div>
             <h3>SOC–Active Directory Lab</h3>
-            <p>An isolated VMware range connecting identity, endpoint telemetry, controlled adversary activity, and cloud detection.</p>
-            <p class="project-outcome"><b>Outcome:</b> Connected controlled AD activity to Windows telemetry and repeatable Sentinel investigations.</p>
-            <div class="tech-list"><span>Active Directory</span><span>Sentinel</span><span>Kali</span><span>Sysmon</span></div>
+            <p>Isolated VMware lab: WIN11 now forwards Security, System, PowerShell and Sysmon events to Splunk; DC-01 DNS SRV and log forwarding are the next checkpoints.</p>
+            <p class="project-outcome"><b>Validated:</b> WIN11 → Splunk ingestion and DC-01 LDAP connectivity. The new authentication-detection exercise is not yet complete.</p>
+            <div class="tech-list"><span>Active Directory</span><span>Splunk</span><span>Kali</span><span>Sysmon</span></div>
             <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noreferrer">Evidence ↗</a></div>
           </article>
 
@@ -241,7 +242,7 @@
             <div class="project-state active-build">Active work</div>
             <h3>KQL Detection & Hunt Pack</h3>
             <p>Reusable queries for process creation, authentication activity, suspicious parent-child relationships, and lab validation.</p>
-            <p class="project-outcome"><b>Outcome:</b> Published reusable KQL and SPL detections with evidence-focused investigation guidance.</p>
+            <p class="project-outcome"><b>Status:</b> Existing detection-query documentation; WIN11-specific SPL validation and expanded Sentinel onboarding are next milestones.</p>
             <div class="tech-list"><span>KQL</span><span>Sentinel</span><span>Windows Events</span></div>
             <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/detections" target="_blank" rel="noreferrer">Queries ↗</a></div>
           </article>
@@ -260,9 +261,9 @@
             <div class="project-index">CASE 04</div>
             <div class="project-state verified">Platform online</div>
             <h3>Splunk SIEM Build</h3>
-            <p>Splunk Enterprise deployed on Ubuntu with service reachability validated; Windows ingestion is the next documented milestone.</p>
-            <p class="project-outcome"><b>Outcome:</b> Established the second analysis platform and documented the remaining ingestion milestone.</p>
-            <div class="tech-list"><span>Splunk 10.4.2</span><span>Ubuntu</span><span>TCP 1137</span></div>
+            <p>Splunk Enterprise on Ubuntu receives WIN11 Security, System, PowerShell Operational and Sysmon Operational events via Universal Forwarder.</p>
+            <p class="project-outcome"><b>Validated:</b> 11,892 indexed events across four channels in one 24-hour search, including 9,703 Sysmon events.</p>
+            <div class="tech-list"><span>Splunk 10.4.2</span><span>Universal Forwarder</span><span>Sysmon</span><span>TCP 9997</span></div>
             <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem" target="_blank" rel="noreferrer">Build notes ↗</a></div>
           </article>
 
@@ -290,12 +291,14 @@
           </article>
         </div>
 
+        <div class="evidence-note reveal"><div><span>TECHNICAL CASE STUDIES</span><strong><a href="./projects.html">Explore all projects and source repositories ↗</a></strong></div><p>See validated lab outcomes, active investigation milestones and direct links to versioned GitHub evidence.</p></div>
+
         <div class="evidence-note reveal">
           <div>
             <span>CLAIM STANDARD</span>
             <strong>Validated · Documented · Staged</strong>
           </div>
-          <p>“Validated” means the service, path, or answer was directly checked. “Documented” records completed build work. “Staged” is clearly identified as the next milestone.</p>
+          <p>“Validated” means the service, path, or answer was directly checked. “Documented” records completed build work. “Staged” is clearly identified as the next milestone. <a href="./projects.html">Explore project evidence ↗</a></p>
         </div>
       </section>
 
