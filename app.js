@@ -123,7 +123,7 @@ const cases = {
   "splunk-build": {
     kicker: "CASE 04 · SIEM ENGINEERING",
     title: "Splunk SIEM Build",
-    deck: "A self-hosted Ubuntu Splunk deployment with verified Windows 11 Security, System, PowerShell and Sysmon event ingestion."
+    deck: "A self-hosted Ubuntu Splunk deployment with verified Windows 11 Security, System, PowerShell and Sysmon event ingestion.",
     facts: [["Host", "SPLUNK-01"], ["OS", "Ubuntu"], ["Version", "10.4.2"]],
     method: [
       "Installed the Linux AMD64 Splunk Enterprise package on Ubuntu.",

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>A failed logon is evidence—not a verdict — Dylan Senez</title><meta name="description" content="What Event 4625 establishes, what it does not, and the evidence still needed for a cross-SIEM authentication investigation."><meta name="theme-color" content="#07111d"><link rel="canonical" href="https://dylans7j.github.io/Portfolio/articles/smb-authentication-visibility.html"><meta property="og:title" content="A failed logon is evidence—not a verdict"><meta property="og:description" content="What Event 4625 establishes, what it does not, and the evidence still needed for a cross-SIEM authentication investigation."><meta property="og:type" content="article"><meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../articles.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a><nav aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../projects.html">Projects</a><a href="../write-ups.html" aria-current="page">Writeups & Investigations</a><a href="../index.html#contact">Contact</a></nav></header><main id="main" class="journal"><a class="article-link" href="../write-ups.html">← All articles</a><div class="journal-hero"><p class="eyebrow">INC-001 / Investigation notes / 3 MIN READ</p><h1>A failed logon is evidence—not a verdict</h1><p>What Event 4625 establishes, what it does not, and the evidence still needed for a cross-SIEM authentication investigation.</p><p class="article-state">Documented · validation incomplete</p><div class="article-tags"><span>Windows</span><span>SMB</span><span>Sentinel</span><span>Splunk</span><span>KQL</span><span>4625</span></div></div><div class="source-note">Source reviewed 2026-09-24. <a href="https://github.com/Dylans7j/SOC-Lab/blob/64289c8cd0777009592f2bdbb1da3e4c24d81f20/investigations/INC-001-smb-authentication-failures.md">Read the exact GitHub source</a> · commit 64289c8. This article is generated from that Markdown, not maintained as a second draft. Evidence status reflects the source report; no independent retest is claimed. Only individually reviewed images are displayed.</div><div class="reading-layout"><nav class="toc" aria-label="On this page"><strong>ON THIS PAGE</strong><a href="#status">Status</a><a href="#objective">Objective</a><a href="#authorized-scope">Authorized scope</a><a href="#data-sources">Data sources</a><a href="#test-method">Test method</a><a href="#detection-logic">Detection logic</a><a href="#evidence">Evidence</a><a href="#analyst-assessment">Analyst assessment</a><a href="#att-ck-context">ATT&amp;CK context</a><a href="#triage-questions">Triage questions</a><a href="#defensive-actions">Defensive actions</a><a href="#next-validation-step">Next validation step</a></nav><article class="article-body"><h2 id="status">Status</h2><p><strong>Documented.</strong> Windows Security Event ID 4625 visibility was confirmed. Sanitized Sentinel and Splunk result captures are still required before the complete cross-platform investigation is labeled validated.</p>
+<h2 id="objective">Objective</h2><p>Determine whether controlled SMB authentication attempts from the authorized Kali lab host are visible in Windows telemetry and can be summarized consistently in Microsoft Sentinel and Splunk.</p>
+<h2 id="authorized-scope">Authorized scope</h2><ul>
+<li>Isolated home-lab network</li>
+<li>Kali testing host</li>
+<li>Windows domain controller</li>
+<li>Microsoft Sentinel workspace</li>
+<li>Splunk Enterprise instance</li>
+</ul>
+<p>No production or third-party systems were tested.</p>
+<h2 id="data-sources">Data sources</h2><ul>
+<li>Windows Security Event Log</li>
+<li>Event ID 4625: failed account logon</li>
+<li>Microsoft Sentinel <code>Event</code> table</li>
+<li>Splunk Windows Security sourcetype</li>
+</ul>
+<h2 id="test-method">Test method</h2><ol>
+<li>Confirm that Windows Security auditing and both collection paths are operating.</li>
+<li>From Kali, perform a small number of controlled SMB authentication attempts using a lab-only test account or deliberately invalid credentials.</li>
+<li>Record the test start and end time.</li>
+<li>Search for Event ID 4625 in Sentinel and Splunk.</li>
+<li>Correlate source address, targeted account, host, logon type, failure reason, and timestamp.</li>
+<li>Preserve sanitized result evidence.</li>
+</ol>
+<h2 id="detection-logic">Detection logic</h2><ul>
+<li><a href="https://github.com/Dylans7j/SOC-Lab/blob/64289c8cd0777009592f2bdbb1da3e4c24d81f20/detections/kql/failed-logons.kql">KQL hunt</a></li>
+<li><a href="https://github.com/Dylans7j/SOC-Lab/blob/64289c8cd0777009592f2bdbb1da3e4c24d81f20/detections/spl/failed-logons.spl">SPL hunt</a></li>
+</ul>
+<p>The current queries summarize attempts by source address and targeted user. Thresholds are intentionally omitted until baseline activity is measured.</p>
+<h2 id="evidence">Evidence</h2><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Evidence</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>EV-001</td>
+<td>Controlled SMB authentication command and timestamp</td>
+<td>Pending sanitized capture</td>
+</tr>
+<tr>
+<td>EV-002</td>
+<td>Windows Event ID 4625 on the domain controller</td>
+<td>Confirmed</td>
+</tr>
+<tr>
+<td>EV-003</td>
+<td>Sentinel query result with expected fields</td>
+<td>Pending attachment</td>
+</tr>
+<tr>
+<td>EV-004</td>
+<td>Splunk query result with expected fields</td>
+<td>Pending attachment</td>
+</tr>
+</tbody></table></div>
+<h2 id="analyst-assessment">Analyst assessment</h2><p>The confirmed 4625 event demonstrates failed-authentication visibility on the Windows host. It does not, by itself, prove brute force or password spraying. Classification requires the attempt count, time window, account distribution, source context, and comparison with normal administrative activity.</p>
+<h2 id="att-ck-context">ATT&amp;CK context</h2><ul>
+<li>T1110 — Brute Force</li>
+<li>T1110.003 — Password Spraying</li>
+</ul>
+<p>These mappings describe behaviors the investigation can help identify; they are not claims that either technique occurred in this test.</p>
+<h2 id="triage-questions">Triage questions</h2><ul>
+<li>Was one account targeted repeatedly or were many accounts targeted?</li>
+<li>Did all attempts originate from the expected lab host?</li>
+<li>Was there a successful logon after the failures?</li>
+<li>What logon type and status/substatus codes were recorded?</li>
+<li>Did endpoint or network telemetry show related enumeration?</li>
+</ul>
+<h2 id="defensive-actions">Defensive actions</h2><ul>
+<li>Confirm an appropriate account-lockout policy.</li>
+<li>Investigate distributed failures across many accounts or hosts.</li>
+<li>Correlate failures with successful Event ID 4624 logons.</li>
+<li>Exclude documented scanners and administrative systems only after validation.</li>
+<li>Tune thresholds using the environment&#39;s authentication baseline.</li>
+</ul>
+<h2 id="next-validation-step">Next validation step</h2><p>Attach sanitized Sentinel and Splunk results showing the same controlled test window and expected fields, then update the status from <strong>Documented</strong> to <strong>Validated</strong>.</p>
+</article></div><footer class="journal-footer">Dylan Senez / d4rkgunn3r · Authorized labs. Evidence before conclusions.<br><a href="../write-ups.html">Article library</a> · <a href="https://github.com/Dylans7j/SOC-Lab">GitHub source</a></footer></main></body></html>

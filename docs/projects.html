@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Evidence-based cybersecurity projects by Dylan Senez, including Windows 11 Sysmon and Splunk ingestion, an Active Directory SOC lab, and detection-engineering research." />
+  <meta name="theme-color" content="#07111d" />
+  <link rel="canonical" href="https://dylans7j.github.io/Portfolio/projects.html" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <title>Technical Projects — Dylan Senez</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <link rel="stylesheet" href="./projects.css" />
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<header class="site-header">
+  <a class="brand" href="./index.html" aria-label="Portfolio homepage"><span class="brand-mark" aria-hidden="true">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a>
+  <nav aria-label="Primary navigation"><a href="./index.html#profile">Profile</a><a href="./index.html#architecture">Lab</a><a href="./index.html#evidence">Featured work</a><a href="./projects.html" aria-current="page">Projects</a><a href="./index.html#contact">Contact</a></nav>
+  <span class="privacy-pill"><i aria-hidden="true"></i>Evidence-first portfolio</span>
+</header>
+<main id="main" class="projects-main">
+  <section class="projects-hero">
+    <p class="eyebrow">TECHNICAL PROJECTS / VERIFIED WORK</p>
+    <h1>From telemetry to <em>defensible findings.</em></h1>
+    <p>Selected work across SOC operations, endpoint telemetry, Active Directory and incident investigation. Each project states what was validated, what is documented and what remains in progress. Source code and technical notes live in GitHub; this page provides the context and outcomes.</p>
+    <div class="projects-actions"><a class="button primary" href="#featured">Explore project evidence ↓</a><a class="button secondary" href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener noreferrer">SOC-Lab source ↗</a><a class="button secondary" href="https://github.com/Dylans7j/HackTheBox-Walkthroughs" target="_blank" rel="noopener noreferrer">HTB write-ups ↗</a></div>
+  </section>
+  <section class="section projects-list" id="featured" aria-labelledby="featured-title">
+    <div class="section-heading"><div><p class="eyebrow">01 / DEPLOYMENT & VALIDATION</p><h2 id="featured-title">Windows 11 → Splunk SIEM</h2></div><p>A working endpoint-to-indexer telemetry pipeline; the first reproducible foundation for attack-and-detection case studies.</p></div>
+    <article class="project-detail featured-detail">
+      <div class="project-detail-heading"><div><span class="project-kicker">ENDPOINT TELEMETRY / SPLUNK</span><h3>Windows 11 monitoring infrastructure</h3></div><span class="project-state verified">Validated in lab</span></div>
+      <p>Deployed Splunk Universal Forwarder on a VMware Windows 11 VM and connected it to the isolated Ubuntu Splunk Enterprise instance. Resolved a Sysmon event-channel permission failure by granting the forwarder service identity membership in Event Log Readers, then verified indexed telemetry in Splunk.</p>
+      <div class="fact-grid"><div><strong>4</strong><span>Verified event channels</span></div><div><strong>11,892</strong><span>Events observed in a selected 24-hour search</span></div><div><strong>9,703</strong><span>Sysmon events in that search</span></div><div><strong>TCP 9997</strong><span>Active Universal Forwarder destination</span></div></div>
+      <h4>Observed evidence</h4>
+      <ul><li>Active forwarder connection confirmed and TCP connectivity tested from WIN11 to SPLUNK-01.</li><li>Indexed sources: Windows Security, System, PowerShell Operational and Sysmon Operational.</li><li>Sysmon Event ID 1 process creation confirmed locally; Sysmon source data subsequently observed in Splunk.</li><li>Indexer web interface reachable over the lab network. Event counts describe one search window, not ongoing ingestion volume.</li></ul>
+      <h4>Next validation</h4>
+      <p>Save sanitized searches and event screenshots, normalize XML-extracted fields, and correlate a controlled authentication test with endpoint process telemetry. Azure Monitor Agent / WIN11 Sentinel onboarding is deferred.</p>
+      <div class="detail-links"><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener noreferrer">SOC-Lab repository ↗</a><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem" target="_blank" rel="noopener noreferrer">Dual-SIEM documentation ↗</a></div>
+    </article>
+  </section>
+  <section class="section projects-list" aria-labelledby="research-title">
+    <div class="section-heading"><div><p class="eyebrow">02 / INVESTIGATIONS & LAB WORK</p><h2 id="research-title">Documented work and next investigations.</h2></div><p>Public documentation links to GitHub; work without complete supporting evidence is explicitly marked as in progress.</p></div>
+    <div class="projects-detail-grid">
+      <article class="project-detail"><div class="project-detail-heading"><h3>SOC–Active Directory Lab</h3><span class="project-state active-build">In progress</span></div><p>VMware lab with DC-01, Kali, Windows endpoints, Sysmon, Splunk and Microsoft Sentinel. WIN11's Splunk telemetry is verified. LDAP connectivity to DC-01 is verified, while the queried AD DNS SRV record is unresolved and DC-01's current Splunk ingestion needs validation.</p><h4>Next evidence milestone</h4><p>Confirm the AD DNS zone, onboard or verify DC-01 Security events, then perform a scoped failed-authentication experiment and investigate the resulting event sequence.</p><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener noreferrer">Open lab repository ↗</a></article>
+      <article class="project-detail"><div class="project-detail-heading"><h3>LLMNR / NBT-NS poisoning</h3><span class="project-state verified">Documented</span></div><p>A controlled Active Directory attack scenario recording Responder methodology, expected or observed Windows/network evidence, and mitigation considerations. The published write-up separates the method from the evidence required to validate a detection.</p><h4>Next evidence milestone</h4><p>Add sanitized result screenshots and test a SPL detection against captured lab traffic.</p><a href="https://github.com/Dylans7j/SOC-Lab/blob/main/attack-scenarios/llmnr-nbtns-poisoning.md" target="_blank" rel="noopener noreferrer">Read scenario ↗</a></article>
+      <article class="project-detail"><div class="project-detail-heading"><h3>Windows Event 4688 investigation</h3><span class="project-state verified">Completed exercise</span></div><p>Security.evtx process-creation analysis examining process ancestry, timestamps and candidate activity while avoiding unsupported malware attribution. This exercise is distinct from the new WIN11 Sysmon build.</p><h4>Next evidence milestone</h4><p>Publish a sanitized timestamped process tree with corroborating network events and a documented reasoning trail.</p><a href="./index.html#evidence" >Read portfolio summary ↗</a></article>
+      <article class="project-detail"><div class="project-detail-heading"><h3>Detection engineering: SPL + KQL</h3><span class="project-state active-build">Expanding</span></div><p>Query library and investigation notes focused on failed logons, host/process context and alert triage. Existing Sentinel work is documented; WIN11-specific Sentinel collection remains deferred.</p><h4>Next evidence milestone</h4><p>Validate one SPL detection against fresh lab events, produce a matching Sigma rule and record expected outcomes and false-positive limitations.</p><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/detections" target="_blank" rel="noopener noreferrer">Explore detections ↗</a></article>
+    </div>
+  </section>
+  <section class="section projects-list" aria-labelledby="repositories-title"><div class="section-heading"><div><p class="eyebrow">03 / SOURCE & WRITE-UPS</p><h2 id="repositories-title">Technical artifacts.</h2></div><p>GitHub holds versioned commands, detection rules, reports and implementation details.</p></div>
+    <div class="repo-grid">
+      <a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noopener noreferrer"><span>SOC OPERATIONS</span><strong>SOC-Lab ↗</strong><p>Architecture, detection queries, attack scenarios and investigations.</p></a>
+      <a href="https://github.com/Dylans7j/HackTheBox-Walkthroughs" target="_blank" rel="noopener noreferrer"><span>AUTHORIZED PRACTICE</span><strong>HackTheBox-Walkthroughs ↗</strong><p>Methodology, Sherlock investigations and documented lab learning.</p></a>
+      <a href="https://github.com/Dylans7j/CS499-ePortfolio" target="_blank" rel="noopener noreferrer"><span>SOFTWARE ENGINEERING</span><strong>CS 499 ePortfolio ↗</strong><p>Code review, enhanced artifacts, narratives and self-assessment.</p></a>
+    </div>
+    <p class="projects-disclosure">Evidence status last reviewed September 2026. Counts are snapshots of one Splunk query, not independently audited metrics. No passwords, tokens or sensitive raw telemetry are published.</p>
+  </section>
+</main>
+<footer><div><span class="brand-mark" aria-hidden="true">DS</span><b>Dylan Senez</b></div><p>SOC · Active Directory · DFIR · Detection Engineering</p><p><a href="./index.html">Return to portfolio</a></p></footer>
+</body></html>

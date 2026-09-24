@@ -1,0 +1,40 @@
+{
+  "repository": "Dylans7j/SOC-Lab",
+  "ref": "64289c8cd0777009592f2bdbb1da3e4c24d81f20",
+  "reviewed": "2026-09-24",
+  "articles": [
+    {
+      "slug": "ad-authentication-investigation",
+      "title": "Following failed logons from endpoint to detection",
+      "label": "INC-002 / Active Directory",
+      "category": "investigation",
+      "status": "Lab detection validated",
+      "summary": "An Active Directory authentication investigation: event evidence, XML field extraction, refined SPL, and a portable Sigma rule.",
+      "tags": ["Windows", "Active Directory", "Splunk", "SPL", "Sigma", "4625"],
+      "path": "investigations/INC-002-Active-Directory-Authentication-Investigation/README.md",
+      "images": ["screenshots/06-splunk-refined-detection.png"]
+    },
+    {
+      "slug": "windows-splunk-telemetry",
+      "title": "When Sysmon is running, but the SIEM is missing its events",
+      "label": "Engineering / Windows telemetry",
+      "category": "engineering",
+      "status": "Ingestion documented as verified",
+      "summary": "Troubleshooting a forwarder read-permission failure and verifying four Windows log channels in Splunk—not just a running service.",
+      "tags": ["Windows", "Sysmon", "Splunk", "PowerShell", "Telemetry"],
+      "path": "docs/WIN11-SPLUNK-ONBOARDING.md",
+      "images": []
+    },
+    {
+      "slug": "smb-authentication-visibility",
+      "title": "A failed logon is evidence—not a verdict",
+      "label": "INC-001 / Investigation notes",
+      "category": "investigation",
+      "status": "Documented · validation incomplete",
+      "summary": "What Event 4625 establishes, what it does not, and the evidence still needed for a cross-SIEM authentication investigation.",
+      "tags": ["Windows", "SMB", "Sentinel", "Splunk", "KQL", "4625"],
+      "path": "investigations/INC-001-smb-authentication-failures.md",
+      "images": []
+    }
+  ]
+}

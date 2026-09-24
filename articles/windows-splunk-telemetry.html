@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>When Sysmon is running, but the SIEM is missing its events — Dylan Senez</title><meta name="description" content="Troubleshooting a forwarder read-permission failure and verifying four Windows log channels in Splunk—not just a running service."><meta name="theme-color" content="#07111d"><link rel="canonical" href="https://dylans7j.github.io/Portfolio/articles/windows-splunk-telemetry.html"><meta property="og:title" content="When Sysmon is running, but the SIEM is missing its events"><meta property="og:description" content="Troubleshooting a forwarder read-permission failure and verifying four Windows log channels in Splunk—not just a running service."><meta property="og:type" content="article"><meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../articles.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a><nav aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../projects.html">Projects</a><a href="../write-ups.html" aria-current="page">Writeups & Investigations</a><a href="../index.html#contact">Contact</a></nav></header><main id="main" class="journal"><a class="article-link" href="../write-ups.html">← All articles</a><div class="journal-hero"><p class="eyebrow">Engineering / Windows telemetry / 3 MIN READ</p><h1>When Sysmon is running, but the SIEM is missing its events</h1><p>Troubleshooting a forwarder read-permission failure and verifying four Windows log channels in Splunk—not just a running service.</p><p class="article-state">Ingestion documented as verified</p><div class="article-tags"><span>Windows</span><span>Sysmon</span><span>Splunk</span><span>PowerShell</span><span>Telemetry</span></div></div><div class="source-note">Source reviewed 2026-09-24. <a href="https://github.com/Dylans7j/SOC-Lab/blob/64289c8cd0777009592f2bdbb1da3e4c24d81f20/docs/WIN11-SPLUNK-ONBOARDING.md">Read the exact GitHub source</a> · commit 64289c8. This article is generated from that Markdown, not maintained as a second draft. Evidence status reflects the source report; no independent retest is claimed. Only individually reviewed images are displayed.</div><div class="reading-layout"><nav class="toc" aria-label="On this page"><strong>ON THIS PAGE</strong><a href="#validated-components">Validated components</a><a href="#reproducible-configuration">Reproducible configuration</a><a href="#sysmon-subscription-failure-and-resolution">Sysmon subscription failure and resolution</a><a href="#actual-ingestion-validation">Actual ingestion validation</a><a href="#next-evidence-milestone">Next evidence milestone</a><a href="#hardening-backlog">Hardening backlog</a></nav><article class="article-body"><p><strong>Status:</strong> verified through operator-provided PowerShell outputs and Splunk search screenshots in September 2026. Sanitized evidence images still need to be added to the repository.</p>
+<p><strong>Public network notation:</strong> <code>192.169.70.x</code> is a redaction placeholder, <strong>not</strong> the real configuration or a private network recommendation. No actual interface addresses, gateway addresses or NAT leases are published in this document.</p>
+<h2 id="validated-components">Validated components</h2><ul>
+<li>WIN-01-W11 is the VM label; <code>WIN11</code> is the hostname returned by Windows and indexed in Splunk.</li>
+<li>Windows 11 has separate lab-only and NAT virtual network interfaces.</li>
+<li>Local Sysmon service runs and its Operational channel is enabled.</li>
+<li>Splunk Universal Forwarder runs under <code>NT SERVICE\SplunkForwarder</code> and actively forwards to SPLUNK-01 on <strong>TCP 9997</strong>.</li>
+<li>Splunk indexed Windows Security, System, PowerShell Operational and Sysmon Operational in index <code>main</code>.</li>
+</ul>
+<h2 id="reproducible-configuration">Reproducible configuration</h2><p>Confirm your <strong>own</strong> authorized lab addresses locally rather than pasting a documented example into production.</p>
+<pre><code class="language-powershell">Get-NetIPConfiguration
+Get-Service Sysmon64, SplunkForwarder
+Get-CimInstance Win32_Service -Filter &quot;Name=&#39;SplunkForwarder&#39;&quot; |
+    Select-Object Name, StartName, State
+&amp; &#39;C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe&#39; list forward-server
+</code></pre>
+<p>The confirmed WIN11 event inputs in <code>C:\Program Files\SplunkUniversalForwarder\etc\system\local\inputs.conf</code> are:</p>
+<pre><code class="language-ini">[WinEventLog://Security]
+disabled = 0
+index = main
+renderXml = 1
+
+[WinEventLog://System]
+disabled = 0
+index = main
+renderXml = 1
+
+[WinEventLog://Microsoft-Windows-Sysmon/Operational]
+disabled = 0
+index = main
+renderXml = 1
+
+[WinEventLog://Microsoft-Windows-PowerShell/Operational]
+disabled = 0
+index = main
+renderXml = 1
+</code></pre>
+<p>Reload after changes with <code>Restart-Service SplunkForwarder</code>, then inspect effective configuration:</p>
+<pre><code class="language-powershell">&amp; &#39;C:\Program Files\SplunkUniversalForwarder\bin\splunk.exe&#39; btool inputs list --debug |
+    Select-String &#39;Sysmon&#39; -Context 2,8
+</code></pre>
+<h2 id="sysmon-subscription-failure-and-resolution">Sysmon subscription failure and resolution</h2><p>Sysmon had more than 31,000 local events, including recent process-creation events (Event ID 1), but the forwarder initially logged:</p>
+<pre><code class="language-text">Could not subscribe to Windows Event Log channel
+&#39;Microsoft-Windows-Sysmon/Operational&#39;
+errorCode=5
+</code></pre>
+<p>Windows <code>wevtutil gl Microsoft-Windows-Sysmon/Operational</code> showed read permission for the built-in Event Log Readers group. The forwarder service identity was <code>NT SERVICE\SplunkForwarder</code>. The observed repair was to add that identity to the existing group and restart the forwarder:</p>
+<pre><code class="language-powershell">Add-LocalGroupMember -Group &#39;Event Log Readers&#39; -Member &#39;NT SERVICE\SplunkForwarder&#39;
+Restart-Service SplunkForwarder
+Get-LocalGroupMember -Group &#39;Event Log Readers&#39;
+</code></pre>
+<p>The membership was verified. A subsequent log-tail check contained no new access-denied messages, and a Splunk search showed real Sysmon-source events. No broad Sysmon channel ACL rewrite was necessary.</p>
+<h2 id="actual-ingestion-validation">Actual ingestion validation</h2><p>Do <strong>not</strong> confuse a search for the word <code>Sysmon</code> with real Sysmon ingestion: PowerShell logs can contain commands mentioning that word.</p>
+<pre><code class="language-spl">index=* host=WIN11
+| stats count latest(_time) as lastEvent by index, source, sourcetype
+| convert ctime(lastEvent)
+| sort - count
+</code></pre>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Actual source</th>
+<th align="right">Captured count over selected 24 hours</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>WinEventLog:Microsoft-Windows-Sysmon/Operational</code></td>
+<td align="right">9,703</td>
+</tr>
+<tr>
+<td><code>WinEventLog:Security</code></td>
+<td align="right">1,683</td>
+</tr>
+<tr>
+<td><code>WinEventLog:Microsoft-Windows-PowerShell/Operational</code></td>
+<td align="right">406</td>
+</tr>
+<tr>
+<td><code>WinEventLog:System</code></td>
+<td align="right">100</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td align="right"><strong>11,892</strong></td>
+</tr>
+</tbody></table></div>
+<p>The data had XML event sourcetypes because <code>renderXml=1</code>. If searches by <code>Image</code>, <code>ParentImage</code> or <code>EventCode</code> fail, inspect actual indexed <code>_raw</code> data and field extractions first.</p>
+<h2 id="next-evidence-milestone">Next evidence milestone</h2><pre><code class="language-powershell">Start-Process notepad.exe
+Get-WinEvent -FilterHashtable @{
+    LogName = &#39;Microsoft-Windows-Sysmon/Operational&#39;
+    Id = 1
+    StartTime = (Get-Date).AddMinutes(-5)
+} -ErrorAction SilentlyContinue |
+    Select-Object -First 5 TimeCreated, Id
+</code></pre>
+<pre><code class="language-spl">index=main host=WIN11 earliest=-15m
+source=&quot;WinEventLog:Microsoft-Windows-Sysmon/Operational&quot;
+| table _time, host, source, sourcetype, _raw
+| sort - _time
+</code></pre>
+<p>Attach a sanitized output screenshot with timestamp context. WIN11&#39;s Microsoft Sentinel onboarding is deferred; this write-up documents <strong>Splunk</strong>, not demonstrated simultaneous dual-SIEM ingestion.</p>
+<h2 id="hardening-backlog">Hardening backlog</h2><p>The forwarder logs indicated receiver-certificate verification was disabled and a Splunk default certificate was present. Replace the receiving certificate, configure an appropriate trusted certificate authority and test authentication before claiming encrypted transport is correctly authenticated.</p>
+</article></div><footer class="journal-footer">Dylan Senez / d4rkgunn3r · Authorized labs. Evidence before conclusions.<br><a href="../write-ups.html">Article library</a> · <a href="https://github.com/Dylans7j/SOC-Lab">GitHub source</a></footer></main></body></html>

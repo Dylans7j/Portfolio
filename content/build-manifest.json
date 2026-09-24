@@ -1,0 +1,22 @@
+{
+  "repository": "Dylans7j/SOC-Lab",
+  "ref": "64289c8cd0777009592f2bdbb1da3e4c24d81f20",
+  "reviewed": "2026-09-24",
+  "articles": [
+    {
+      "slug": "ad-authentication-investigation",
+      "source": "investigations/INC-002-Active-Directory-Authentication-Investigation/README.md",
+      "sha256": "7df663c44f163ab342a3b1dd67d8d6bb382fbe7f46cfaf0cee987422cc24a737"
+    },
+    {
+      "slug": "windows-splunk-telemetry",
+      "source": "docs/WIN11-SPLUNK-ONBOARDING.md",
+      "sha256": "c0d72845884b0861070e925f98a69f872d1d0a838f18808a3518905a392ddd21"
+    },
+    {
+      "slug": "smb-authentication-visibility",
+      "source": "investigations/INC-001-smb-authentication-failures.md",
+      "sha256": "1f7ed2720153620e00e1ec9ba390ed3a3e04d825b3288494817cef792e9fa7bb"
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Following failed logons from endpoint to detection — Dylan Senez</title><meta name="description" content="An Active Directory authentication investigation: event evidence, XML field extraction, refined SPL, and a portable Sigma rule."><meta name="theme-color" content="#07111d"><link rel="canonical" href="https://dylans7j.github.io/Portfolio/articles/ad-authentication-investigation.html"><meta property="og:title" content="Following failed logons from endpoint to detection"><meta property="og:description" content="An Active Directory authentication investigation: event evidence, XML field extraction, refined SPL, and a portable Sigma rule."><meta property="og:type" content="article"><meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../articles.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a><nav aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../projects.html">Projects</a><a href="../write-ups.html" aria-current="page">Writeups & Investigations</a><a href="../index.html#contact">Contact</a></nav></header><main id="main" class="journal"><a class="article-link" href="../write-ups.html">← All articles</a><div class="journal-hero"><p class="eyebrow">INC-002 / Active Directory / 6 MIN READ</p><h1>Following failed logons from endpoint to detection</h1><p>An Active Directory authentication investigation: event evidence, XML field extraction, refined SPL, and a portable Sigma rule.</p><p class="article-state">Lab detection validated</p><div class="article-tags"><span>Windows</span><span>Active Directory</span><span>Splunk</span><span>SPL</span><span>Sigma</span><span>4625</span></div></div><div class="source-note">Source reviewed 2026-09-24. <a href="https://github.com/Dylans7j/SOC-Lab/blob/64289c8cd0777009592f2bdbb1da3e4c24d81f20/investigations/INC-002-Active-Directory-Authentication-Investigation/README.md">Read the exact GitHub source</a> · commit 64289c8. This article is generated from that Markdown, not maintained as a second draft. Evidence status reflects the source report; no independent retest is claimed. Only individually reviewed images are displayed.</div><div class="reading-layout"><nav class="toc" aria-label="On this page"><strong>ON THIS PAGE</strong><a href="#1-executive-summary">1. Executive Summary</a><a href="#2-scope-and-authorization">2. Scope and Authorization</a><a href="#3-timeline-of-activity">3. Timeline of Activity</a><a href="#4-attack-simulation-evidence">4. Attack Simulation Evidence</a><a href="#5-host-and-log-evidence">5. Host and Log Evidence</a><a href="#6-analysis">6. Analysis</a><a href="#7-validated-detection-logic">7. Validated Detection Logic</a><a href="#8-assessment">8. Assessment</a><a href="#9-false-positives">9. False Positives</a><a href="#10-response-and-remediation-recommendations">10. Response and Remediation Recommendations</a><a href="#11-lessons-learned">11. Lessons Learned</a><a href="#12-final-result">12. Final Result</a></nav><article class="article-body"><blockquote>
+<p><strong>Report type:</strong> Detection Engineering / Incident Response Case Study<br><strong>Environment:</strong> Isolated SOC home lab<br><strong>Primary data source:</strong> Windows Security logs from <code>DC01</code> ingested into Splunk<br><strong>Status:</strong> Detection validated<br><strong>Sensitivity note:</strong> Public screenshots and examples use <code>192.169.70.x</code> as a documentation placeholder. It is not the operational lab addressing scheme.</p>
+</blockquote>
+<hr>
+<h2 id="1-executive-summary">1. Executive Summary</h2><p>This report documents a controlled authentication-failure investigation against an Active Directory domain controller. Kali generated SMB authentication failures against a disposable domain account, <code>soc.detect01</code>, using NetExec. <code>DC01</code> recorded Windows Security Event ID <code>4625</code>, and Splunk identified repeated incorrect-password network logons from the same source within a five-minute window.</p>
+<p>The validated detection identifies probable brute-force-style authentication behavior where Windows logs show:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Detection Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Event ID</td>
+<td><code>4625</code></td>
+</tr>
+<tr>
+<td>Logon type</td>
+<td><code>3</code> — Network logon</td>
+</tr>
+<tr>
+<td>Status</td>
+<td><code>0xC000006D</code> — Logon failure</td>
+</tr>
+<tr>
+<td>SubStatus</td>
+<td><code>0xC000006A</code> — Incorrect password</td>
+</tr>
+<tr>
+<td>Threshold</td>
+<td><code>&gt;= 3</code> failures in <code>5m</code> by <code>source_ip</code> and <code>target_user</code></td>
+</tr>
+</tbody></table></div>
+<p><strong>Outcome:</strong> The lab successfully demonstrated an end-to-end detection workflow: attack simulation, event collection, field extraction, SPL detection logic, and Sigma rule creation.</p>
+<hr>
+<h2 id="2-scope-and-authorization">2. Scope and Authorization</h2><p>This activity was conducted in an isolated lab for authorized detection engineering practice. The test used a disposable Active Directory account and intentionally limited authentication attempts. No third-party systems were targeted.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Domain controller</td>
+<td><code>DC01</code></td>
+</tr>
+<tr>
+<td>Attacker system</td>
+<td><code>KALI-01</code></td>
+</tr>
+<tr>
+<td>SIEM</td>
+<td><code>SPLUNK-01</code></td>
+</tr>
+<tr>
+<td>Test account</td>
+<td><code>soc.detect01</code></td>
+</tr>
+<tr>
+<td>Technique exercised</td>
+<td>Repeated failed SMB authentication</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="3-timeline-of-activity">3. Timeline of Activity</h2><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Time</th>
+<th>Event</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>06:07</td>
+<td>Kali verified connectivity to the domain controller.</td>
+</tr>
+<tr>
+<td>06:08</td>
+<td>NetExec SMB authentication attempts returned <code>STATUS_LOGON_FAILURE</code>.</td>
+</tr>
+<tr>
+<td>06:08</td>
+<td><code>DC01</code> generated Windows Security Event ID <code>4625</code>.</td>
+</tr>
+<tr>
+<td>06:13</td>
+<td>Splunk field extraction confirmed failed-logon fields.</td>
+</tr>
+<tr>
+<td>06:15</td>
+<td>Refined SPL detection identified three incorrect-password failures in a five-minute window.</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="4-attack-simulation-evidence">4. Attack Simulation Evidence</h2><p>Kali verified reachability to <code>DC01</code> and used NetExec to attempt SMB authentication against <code>soc.detect01</code> with an intentionally incorrect password.</p>
+<p></p>
+<p><strong>Observed result:</strong> NetExec returned <code>STATUS_LOGON_FAILURE</code>, confirming the authentication attempts reached the domain controller and were rejected.</p>
+<hr>
+<h2 id="5-host-and-log-evidence">5. Host and Log Evidence</h2><p>Splunk captured Windows Security Event ID <code>4625</code> from <code>DC01</code>. The event showed a failed network logon using NTLM.</p>
+<p></p>
+<p></p>
+<h3 id="key-event-fields">Key Event Fields</h3><div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Value</th>
+<th>Interpretation</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>EventID</code></td>
+<td><code>4625</code></td>
+<td>Failed logon</td>
+</tr>
+<tr>
+<td><code>TargetUserName</code></td>
+<td><code>soc.detect01</code></td>
+<td>Targeted disposable account</td>
+</tr>
+<tr>
+<td><code>LogonType</code></td>
+<td><code>3</code></td>
+<td>Network logon</td>
+</tr>
+<tr>
+<td><code>LogonProcessName</code></td>
+<td><code>NtLmSsp</code></td>
+<td>NTLM logon process</td>
+</tr>
+<tr>
+<td><code>AuthenticationPackageName</code></td>
+<td><code>NTLM</code></td>
+<td>Authentication package</td>
+</tr>
+<tr>
+<td><code>Status</code></td>
+<td><code>0xC000006D</code></td>
+<td>Logon failure</td>
+</tr>
+<tr>
+<td><code>SubStatus</code></td>
+<td><code>0xC000006A</code></td>
+<td>Incorrect password</td>
+</tr>
+</tbody></table></div>
+<p>Earlier account-setup failures produced <code>SubStatus = 0xC0000072</code>, meaning the account was disabled. Those events were treated as setup noise and excluded from the final detection.</p>
+<hr>
+<h2 id="6-analysis">6. Analysis</h2><p>Because the Windows events were ingested as XML, Splunk did not rely on default normalized fields. The investigation extracted the required values from <code>_raw</code> using <code>rex</code>.</p>
+<p></p>
+<p>The first aggregation confirmed repeated failed logons, but the broad search window also returned unrelated historical Administrator activity. The final query narrowed the logic to incorrect-password failures only.</p>
+<p></p>
+<p><figure><a href="https://raw.githubusercontent.com/Dylans7j/SOC-Lab/64289c8cd0777009592f2bdbb1da3e4c24d81f20/investigations/INC-002-Active-Directory-Authentication-Investigation/screenshots/06-splunk-refined-detection.png"><img src="https://raw.githubusercontent.com/Dylans7j/SOC-Lab/64289c8cd0777009592f2bdbb1da3e4c24d81f20/investigations/INC-002-Active-Directory-Authentication-Investigation/screenshots/06-splunk-refined-detection.png" alt="Refined repeated failed logon detection" loading="lazy"></a><figcaption>Refined repeated failed logon detection. Original reviewed source image; open for full resolution.</figcaption></figure></p>
+<hr>
+<h2 id="7-validated-detection-logic">7. Validated Detection Logic</h2><h3 id="spl-detection">SPL Detection</h3><pre><code class="language-spl">index=windows host=DC01 source=&quot;WinEventLog:Security&quot; earliest=-10m latest=now
+| rex field=_raw &quot;&lt;EventID[^&gt;]*&gt;(?&lt;event_id&gt;\\d+)&lt;/EventID&gt;&quot;
+| search event_id=&quot;4625&quot;
+| rex field=_raw &quot;&lt;Data Name=&#39;TargetUserName&#39;&gt;(?&lt;target_user&gt;[^&lt;]+)&lt;/Data&gt;&quot;
+| rex field=_raw &quot;&lt;Data Name=&#39;IpAddress&#39;&gt;(?&lt;source_ip&gt;[^&lt;]+)&lt;/Data&gt;&quot;
+| rex field=_raw &quot;&lt;Data Name=&#39;LogonType&#39;&gt;(?&lt;logon_type&gt;[^&lt;]+)&lt;/Data&gt;&quot;
+| rex field=_raw &quot;&lt;Data Name=&#39;Status&#39;&gt;(?&lt;status&gt;[^&lt;]+)&lt;/Data&gt;&quot;
+| rex field=_raw &quot;&lt;Data Name=&#39;SubStatus&#39;&gt;(?&lt;substatus&gt;[^&lt;]+)&lt;/Data&gt;&quot;
+| where logon_type=&quot;3&quot;
+    AND lower(status)=&quot;0xc000006d&quot;
+    AND lower(substatus)=&quot;0xc000006a&quot;
+| bin _time span=5m
+| stats count AS failures by _time, host, target_user, source_ip
+| where failures&gt;=3
+| sort - failures
+</code></pre>
+<h3 id="sigma-rule">Sigma Rule</h3><p>The companion Sigma rule is stored here:</p>
+<pre><code class="language-text">investigations/INC-002-Active-Directory-Authentication-Investigation/detection/win_failed_ad_network_logon.yml
+</code></pre>
+<p>The Sigma rule detects the base Windows event pattern. The SPL query implements the correlation threshold.</p>
+<pre><code class="language-yaml">title: Failed AD Network Logon - Incorrect Password
+id: 0f8e896d-f897-4506-8b8d-c97910894b17
+status: experimental
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4625
+    LogonType: 3
+    Status: &#39;0xC000006D&#39;
+    SubStatus: &#39;0xC000006A&#39;
+  condition: selection
+level: low
+tags:
+  - attack.t1110
+</code></pre>
+<hr>
+<h2 id="8-assessment">8. Assessment</h2><h3 id="finding">Finding</h3><p>Repeated incorrect-password network logons against an Active Directory account were successfully detected from Windows Security telemetry.</p>
+<h3 id="impact">Impact</h3><p>This activity can indicate password guessing, brute-force behavior, stale credentials, or automated access attempts against SMB and other network logon surfaces.</p>
+<h3 id="confidence">Confidence</h3><p><strong>High</strong> for the lab scenario. The detection was validated against known controlled activity, and the Splunk result matched the expected source, target account, failure code, and time window.</p>
+<h3 id="limitations">Limitations</h3><ul>
+<li>The detection currently depends on XML field extraction from <code>_raw</code>.</li>
+<li>A threshold of three failures in five minutes is suitable for the lab but may require tuning in production.</li>
+<li>The query only targets incorrect-password failures and excludes disabled-account failures.</li>
+<li>Additional visibility from Event IDs <code>4771</code> and <code>4776</code> would improve authentication-protocol coverage.</li>
+</ul>
+<hr>
+<h2 id="9-false-positives">9. False Positives</h2><p>Expected benign causes include:</p>
+<ul>
+<li>User password mistypes</li>
+<li>Stale saved credentials</li>
+<li>Expired service-account passwords</li>
+<li>Misconfigured scheduled tasks</li>
+<li>Devices repeatedly attempting access with old credentials</li>
+</ul>
+<p>Recommended tuning fields:</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Tuning Use</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>source_ip</code></td>
+<td>Suppress known scanners or lab systems</td>
+</tr>
+<tr>
+<td><code>target_user</code></td>
+<td>Separate service accounts from human users</td>
+</tr>
+<tr>
+<td><code>host</code></td>
+<td>Restrict to domain controllers</td>
+</tr>
+<tr>
+<td><code>failures</code></td>
+<td>Adjust threshold by environment</td>
+</tr>
+<tr>
+<td><code>_time</code></td>
+<td>Tune detection window</td>
+</tr>
+</tbody></table></div>
+<hr>
+<h2 id="10-response-and-remediation-recommendations">10. Response and Remediation Recommendations</h2><p>For a real environment, the recommended response workflow would be:</p>
+<ol>
+<li>Identify the source host and owner.</li>
+<li>Determine whether the targeted account is human, service, or administrative.</li>
+<li>Review successful logons for the same account before and after the failures.</li>
+<li>Check for additional failures across multiple accounts from the same source.</li>
+<li>Reset credentials if compromise is suspected.</li>
+<li>Isolate or investigate the source endpoint if activity is unauthorized.</li>
+<li>Tune alert suppression for known benign sources.</li>
+</ol>
+<hr>
+<h2 id="11-lessons-learned">11. Lessons Learned</h2><ul>
+<li>Windows Event ID <code>4625</code> provides strong authentication-failure evidence when parsed correctly.</li>
+<li><code>Status</code> and <code>SubStatus</code> materially change the meaning of a failed logon.</li>
+<li>Broad time windows can create noisy results and should be narrowed during validation.</li>
+<li>Detection logic should separate setup noise from the behavior being tested.</li>
+<li>Sigma is useful for portable event logic, while SPL is needed for environment-specific correlation.</li>
+</ul>
+<hr>
+<h2 id="12-final-result">12. Final Result</h2><p>This investigation produced a working detection and report artifact suitable for portfolio review:</p>
+<ul>
+<li>Confirmed attack simulation from Kali</li>
+<li>Confirmed Windows Security event generation on <code>DC01</code></li>
+<li>Confirmed Splunk ingestion into the <code>windows</code> index</li>
+<li>Extracted event fields from XML logs</li>
+<li>Validated repeated-failure SPL detection</li>
+<li>Created Sigma rule for the base event pattern</li>
+<li>Documented screenshots and analysis in one incident-response-style report</li>
+</ul>
+</article></div><footer class="journal-footer">Dylan Senez / d4rkgunn3r · Authorized labs. Evidence before conclusions.<br><a href="../write-ups.html">Article library</a> · <a href="https://github.com/Dylans7j/SOC-Lab">GitHub source</a></footer></main></body></html>
