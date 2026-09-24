@@ -1,0 +1,31 @@
+/* Project case studies page: extends existing portfolio visual language. */
+.projects-main{max-width:1240px;margin:0 auto;padding:32px clamp(18px,4vw,56px) 70px}
+.projects-hero{padding:clamp(38px,7vw,96px) 0 50px;max-width:990px}
+.projects-hero h1{font-size:clamp(2.6rem,6vw,5.3rem);line-height:1.06;letter-spacing:-.045em;margin:20px 0}
+.projects-hero em{color:#73c6fa;font-style:normal}
+.projects-hero>p:not(.eyebrow){font-size:clamp(1rem,1.8vw,1.23rem);line-height:1.75;max-width:780px;color:#afc4d8}
+.projects-actions,.detail-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:24px}
+.project-detail{border:1px solid #27435d;background:linear-gradient(145deg,#10253a,#0b1b2c);border-radius:18px;padding:clamp(22px,3vw,36px);min-width:0}
+.project-detail h3{font-size:1.45rem;margin:5px 0 12px}
+.project-detail p,.project-detail li{color:#b6cbdd;line-height:1.65}
+.project-detail ul{padding-left:21px}
+.project-detail h4{font-size:.85rem;text-transform:uppercase;letter-spacing:.13em;color:#83d1fc;margin:23px 0 8px}
+.project-detail a,.repo-grid a strong{color:#94dbff}
+.project-detail-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap}
+.project-kicker,.repo-grid span{font-size:.76rem;letter-spacing:.16em;color:#7fbcdd}
+.fact-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:25px 0}
+.fact-grid>div{padding:16px;background:#071827;border:1px solid #30516c;border-radius:12px}
+.fact-grid strong{display:block;font-size:1.55rem;color:#daefff}
+.fact-grid span{color:#a6bed1;font-size:.82rem;line-height:1.5;display:block;margin-top:8px}
+.projects-detail-grid,.repo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.projects-detail-grid .project-detail{display:flex;flex-direction:column}
+.projects-detail-grid .project-detail a{margin-top:auto;padding-top:12px}
+.repo-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.repo-grid a{display:block;border:1px solid #29435d;border-radius:15px;background:#0d2032;padding:24px;text-decoration:none}
+.repo-grid a:hover{border-color:#5ba9dc;transform:translateY(-2px)}
+.repo-grid strong{display:block;font-size:1.15rem;margin:12px 0}
+.repo-grid p,.projects-disclosure{color:#a7bed1;line-height:1.6}
+.projects-disclosure{margin-top:22px;font-size:.85rem}
+.projects-list{padding-top:24px;padding-bottom:28px}
+@media(max-width:800px){.fact-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.projects-detail-grid,.repo-grid{grid-template-columns:1fr}}
+@media(max-width:440px){.fact-grid{grid-template-columns:1fr 1fr}.fact-grid strong{font-size:1.18rem}.projects-hero{padding-top:35px}}

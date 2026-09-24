@@ -1,0 +1,8 @@
+{
+  "name": "dylan-security-portfolio",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node scripts/build-articles.mjs", "test": "node scripts/test-articles.mjs" },
+  "devDependencies": { "marked": "17.0.5" },
+  "engines": { "node": ">=22" }
+}

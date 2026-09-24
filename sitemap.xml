@@ -45,4 +45,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url><loc>https://dylans7j.github.io/Portfolio/articles/ad-authentication-investigation.html</loc></url>
+  <url><loc>https://dylans7j.github.io/Portfolio/articles/windows-splunk-telemetry.html</loc></url>
+  <url><loc>https://dylans7j.github.io/Portfolio/articles/smb-authentication-visibility.html</loc></url>
 </urlset>
