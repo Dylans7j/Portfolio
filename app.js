@@ -5,7 +5,7 @@ const nodeData = {
     statusClass: "confirmed",
     title: "Kali Linux",
     summary: "Attack workstation used to generate controlled network and authentication activity inside the isolated lab.",
-    network: "VMnet7: 192.168.70.10",
+    network: "Host-only lab (public placeholder: 192.169.70.x)",
     evidence: "Nmap and NetExec used for isolated AD service discovery and testing; scenario-specific evidence is documented separately.",
     tags: ["Nmap", "NetExec", "Linux"]
   },
@@ -15,7 +15,7 @@ const nodeData = {
     statusClass: "confirmed",
     title: "DC-01",
     summary: "Windows Server domain controller providing Active Directory Domain Services inside the host-only range.",
-    network: "VMnet7: 192.168.70.20",
+    network: "Host-only lab (public placeholder: 192.169.70.x)",
     evidence: "LDAP TCP 389 reachable from WIN11. AD DNS SRV registration is being investigated; current DC-01 Splunk forwarding has not been verified.",
     tags: ["AD DS", "BadBlood", "Windows Server"]
   },
@@ -25,8 +25,8 @@ const nodeData = {
     statusClass: "confirmed",
     title: "WIN11",
     summary: "VMware Windows 11 endpoint forwarding Security, System, PowerShell Operational and Sysmon Operational events into Splunk.",
-    network: "VMnet7: 192.168.70.30 · NAT: 192.168.44.141",
-    evidence: "Active Universal Forwarder to 192.168.70.80:9997; four indexed channels confirmed. DC-01 domain join and WIN11 Sentinel ingestion are not claimed.",
+    network: "Isolated lab + NAT; public address placeholder: 192.169.70.x",
+    evidence: "Active Universal Forwarder to 192.169.70.x:9997; four indexed channels confirmed. DC-01 domain join and WIN11 Sentinel ingestion are not claimed.",
     tags: ["Windows 11", "Universal Forwarder", "Sysmon", "Splunk"]
   },
   sysmon: {
@@ -45,7 +45,7 @@ const nodeData = {
     statusClass: "confirmed",
     title: "SPLUNK-01",
     summary: "Ubuntu server running Splunk Enterprise as the lab’s self-hosted search and investigation platform.",
-    network: "VMnet7: 192.168.70.80 · TCP 9997 receiver · TCP 1137 web",
+    network: "Host-only lab (public placeholder: 192.169.70.x); TCP 9997 receiver; TCP 1137 web",
     evidence: "WIN11 Universal Forwarder is active. One 24-hour search returned 11,892 events across Security, System, PowerShell and Sysmon; 9,703 were Sysmon.",
     tags: ["Splunk 10.4.2", "Ubuntu", "TCP 1137"]
   },
@@ -74,7 +74,7 @@ const cases = {
       "Validated WIN11 telemetry in Splunk; existing Sentinel research remains separate from the deferred WIN11 onboarding."
     ],
     evidence: [
-      "Kali connected to the VMnet7 lab at 192.168.70.10/24.",
+      "Kali connected to the VMnet7 lab at 192.169.70.x.",
       "Observed ports 53, 88, 135, 139, 389, and 445 on the domain controller during service discovery.",
       "Sentinel data and custom KQL work documented; Splunk service reachability independently checked.",
       "CrowdSec was removed from the current design and is not presented as deployed."
@@ -133,7 +133,7 @@ const cases = {
     ],
     evidence: [
       "Splunk Enterprise package: 10.4.2-33c3bf42cd73.",
-      "Universal Forwarder active to 192.168.70.80:9997 and TCP receiver reachable.",
+      "Universal Forwarder active to 192.169.70.x:9997 and TCP receiver reachable.",
       "The lab web interface is configured on TCP 1137.",
       "One 24-hour Splunk search returned 11,892 events across four sources, including 9,703 Sysmon events; counts are a snapshot, not an ingest-rate claim."
     ],
