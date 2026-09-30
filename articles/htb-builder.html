@@ -40,7 +40,7 @@
 
 <div class="reading-layout">
 <aside class="toc">
-  <a href="#overview">Overview</a><a href="#recon">Reconnaissance</a><a href="#foothold">Foothold</a><a href="#jenkins">Jenkins access</a><a href="#privesc">Privilege escalation</a><a href="#screenshots">Screenshots</a><a href="#evidence">Evidence</a><a href="#findings">Findings</a><a href="#defender">Defender view</a><a href="#lessons">Lessons</a>
+  <a href="#overview">Overview</a><a href="#recon">Reconnaissance</a><a href="#foothold">Foothold</a><a href="#jenkins">Jenkins access</a><a href="#privesc">Privilege escalation</a><a href="#evidence">Evidence</a><a href="#findings">Findings</a><a href="#defender">Defender view</a><a href="#lessons">Lessons</a>
 </aside>
 
 <article class="article-body">
@@ -60,7 +60,7 @@
 <pre><code>22/tcp   open  ssh     OpenSSH 8.9p1
 8080/tcp open  http    Jetty / Jenkins</code></pre>
 <h3>Web enumeration</h3>
-<pre><code>http://&lt;TARGET_IP&gt;:8080/</code></pre>
+<pre><code>http://&lt;TARGET_IP&gt;:8080/</code></pre>\n<figure class="screenshot-card inline-evidence"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 2 — Jenkins dashboard and version evidence</figcaption></figure>
 <p>The Jenkins dashboard was reachable on TCP/8080 and reported Jenkins 2.441 in the interface.</p>
 <div class="source-note"><strong>Why this mattered:</strong> Jenkins became the primary application attack surface while SSH remained the likely post-compromise administration channel.</div>
 </section>
@@ -85,7 +85,7 @@ $2a$10$&lt;REDACTED_BCRYPT_HASH&gt;
 EOF</code></pre>
 
 <h3>Crack with Hashcat</h3>
-<pre><code>hashcat -m 3200 -a 0 jennifer.hash /usr/share/wordlists/rockyou.txt --show</code></pre>
+<pre><code>hashcat -m 3200 -a 0 jennifer.hash /usr/share/wordlists/rockyou.txt --show</code></pre>\n<figure class="screenshot-card inline-evidence"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 5 — Offline bcrypt recovery with sensitive value redacted</figcaption></figure>
 <p>The recovered password was valid for Jenkins authentication. The actual hash and plaintext password are intentionally redacted.</p>
 <div class="source-note"><strong>Why this mattered:</strong> File-read access escalated into account compromise because readable Jenkins artifacts exposed offline-crackable authentication material.</div>
 </section>
@@ -142,7 +142,7 @@ println s.plainText</code></pre>
 <pre><code>chmod 600 id-rsa</code></pre>
 
 <h3>Authenticate as root</h3>
-<pre><code>ssh -i id-rsa root@&lt;TARGET_IP&gt;</code></pre>
+<pre><code>ssh -i id-rsa root@&lt;TARGET_IP&gt;</code></pre>\n<figure class="screenshot-card inline-evidence"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 8 — Successful privileged SSH session</figcaption></figure>
 
 <h3>Proof</h3>
 <pre><code>cat /root/root.txt
@@ -151,23 +151,8 @@ println s.plainText</code></pre>
 <div class="source-note"><strong>Why this mattered:</strong> A root-capable SSH credential stored inside Jenkins converted application compromise into direct privileged host access.</div>
 </section>
 
-<section id="screenshots">
-<h2>06 / Screenshot evidence</h2>
-<p>These slots are reserved for the actual evidence images from the assessment. Sensitive values should be masked before publication.</p>
-<div class="screenshot-grid">
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 1 — Nmap service enumeration</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 2 — Jenkins dashboard and version</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 3 — CVE-2024-23897 file-read validation</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 4 — Jenkins user artifact and hash discovery</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 5 — Script Console command execution</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 6 — Jenkins credential decryption output, secret masked</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 7 — Root SSH session</figcaption></figure>
-<figure class="screenshot-card"><div class="screenshot-placeholder">Add screenshot</div><figcaption>Figure 8 — Root proof with flag redacted</figcaption></figure>
-</div>
-</section>
-
 <section id="evidence">
-<h2>07 / Evidence register</h2>
+<h2>06 / Evidence register</h2>
 <div class="table-scroll"><table><thead><tr><th>ID</th><th>Stage</th><th>Artifact</th><th>Status</th></tr></thead><tbody>
 <tr><td>EVD-001</td><td>Recon</td><td>TCP service enumeration</td><td>Documented</td></tr>
 <tr><td>EVD-002</td><td>Web</td><td>Jenkins 2.441 dashboard</td><td>Documented</td></tr>
@@ -181,7 +166,7 @@ println s.plainText</code></pre>
 </section>
 
 <section id="findings">
-<h2>08 / Findings &amp; remediation</h2>
+<h2>07 / Findings &amp; remediation</h2>
 <h3>F-01 — Vulnerable Jenkins release</h3><p><strong>Severity:</strong> High</p><p>The exposed Jenkins deployment was susceptible to arbitrary file-read behavior.</p><ul><li>Upgrade Jenkins to a fixed release.</li><li>Restrict Jenkins CLI exposure.</li><li>Limit administrative access to trusted networks.</li></ul>
 <h3>F-02 — Crackable application credential</h3><p><strong>Severity:</strong> High</p><p>A recovered bcrypt hash yielded a valid Jenkins credential through offline password cracking.</p><ul><li>Require strong unique passwords.</li><li>Use MFA or centralized identity where supported.</li><li>Rotate exposed credentials.</li></ul>
 <h3>F-03 — High-impact Jenkins administration</h3><p><strong>Severity:</strong> High</p><p>The compromised account could access functionality capable of operating-system command execution.</p><ul><li>Restrict Script Console access.</li><li>Apply least-privilege authorization.</li><li>Audit administrative role membership regularly.</li></ul>
@@ -189,7 +174,7 @@ println s.plainText</code></pre>
 </section>
 
 <section id="defender">
-<h2>09 / Defender perspective</h2>
+<h2>08 / Defender perspective</h2>
 <div class="table-scroll"><table><thead><tr><th>Attack stage</th><th>Telemetry</th><th>Detection opportunity</th></tr></thead><tbody>
 <tr><td>Jenkins discovery</td><td>Proxy / Jenkins logs</td><td>Unexpected access to Jenkins from external or untrusted sources</td></tr>
 <tr><td>CLI file read</td><td>Jenkins / WAF logs</td><td>CLI requests associated with sensitive file access patterns</td></tr>
@@ -201,7 +186,7 @@ println s.plainText</code></pre>
 </section>
 
 <section id="lessons">
-<h2>10 / Lessons learned</h2>
+<h2>09 / Lessons learned</h2>
 <ul><li>CI/CD infrastructure is a high-value security boundary, not merely a development tool.</li><li>Arbitrary file read becomes substantially more severe when application secrets and password hashes are locally accessible.</li><li>Application authorization must be evaluated in terms of host-level blast radius.</li><li>Root-equivalent credentials should not be stored in broadly administered CI/CD platforms.</li><li>Commands, observed output, evidence, reasoning, and remediation should remain linked throughout a technical write-up.</li></ul>
 </section>
 </article></div>
