@@ -1,1 +1,237 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Builder — HTB Medium Linux | Dylan Senez</title><meta name="description" content="Evidence-driven Hack The Box Builder case study covering Jenkins CVE-2024-23897, credential exposure, administrative access, and privileged SSH compromise."><meta name="theme-color" content="#07111d"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../articles.css"><link rel="stylesheet" href="../case-study.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a><nav aria-label="Primary navigation"><a href="../index.html">Home</a><a href="../projects.html">Projects</a><a href="../write-ups.html">Write-ups</a><a href="../writeup-builder.html">Builder tool</a></nav></header><main id="main" class="journal case-study"><section class="case-hero"><p class="eyebrow">OFFENSIVE SECURITY / HACK THE BOX</p><h1>Builder.</h1><p class="case-deck">A retired Hack The Box Medium Linux machine demonstrating how an exposed Jenkins service can become a full host compromise through vulnerable CLI behavior, credential exposure, administrative execution, and misuse of stored privileged credentials.</p><div class="case-badges"><span>RETIRED</span><span>MEDIUM</span><span>LINUX</span><span>JENKINS</span></div></section><section class="case-path"><p class="eyebrow">ATTACK PATH</p><div class="path-row"><span>Jenkins Enumeration</span><i>→</i><span>CVE-2024-23897</span><i>→</i><span>Credential Recovery</span><i>→</i><span>Authenticated Jenkins</span><i>→</i><span>Administrative Execution</span><i>→</i><span>Privileged SSH Credential</span><i>→</i><span>Root</span></div></section><section class="case-snapshot"><div><span>Platform</span><b>Hack The Box</b></div><div><span>Difficulty</span><b>Medium</b></div><div><span>OS</span><b>Linux</b></div><div><span>Status</span><b>Documented</b></div></section><div class="reading-layout"><aside class="toc"><a href="#overview">Overview</a><a href="#recon">Reconnaissance</a><a href="#access">Initial access</a><a href="#admin">Jenkins access</a><a href="#privesc">Privilege escalation</a><a href="#evidence">Evidence</a><a href="#findings">Findings</a><a href="#defender">Defender view</a><a href="#lessons">Lessons</a></aside><article class="article-body"><section id="overview"><h2>01 / Case overview</h2><div class="status-box"><strong>Evidence standard</strong><p>Sensitive passwords, password hashes, private keys, and flag values are excluded. The narrative preserves the validated attack chain without publishing secret material.</p></div><p>Builder highlights the security impact of exposing a CI/CD control plane. The assessment moved from Jenkins service discovery to arbitrary file-read capability, recovery of Jenkins account material, authenticated administrative access, and ultimately use of privileged credential material stored by Jenkins.</p><h3>Outcome</h3><p>The documented path reached root-level SSH access. Secret values and proof flags remain redacted.</p></section><section id="recon"><h2>02 / Reconnaissance</h2><p>Network enumeration identified SSH on TCP/22 and Jenkins served through Jetty on TCP/8080. The Jenkins interface reported version 2.441, placing it in the affected range for CVE-2024-23897.</p><div class="source-note"><strong>Why this mattered:</strong> Jenkins became the primary application-layer attack surface, while SSH remained the likely post-compromise access path.</div></section><section id="access"><h2>03 / Initial access</h2><p>CVE-2024-23897 was used to establish arbitrary file-read capability against the Jenkins controller. Reading local account and Jenkins user metadata exposed the Jenkins service account context and a stored bcrypt password hash associated with a Jenkins user.</p><p>The hash was cracked offline, producing a valid Jenkins credential and converting unauthenticated file-read access into authenticated application access.</p><div class="source-note"><strong>Why this mattered:</strong> A file-read flaw became a credential-compromise path because Jenkins application artifacts contained authentication material.</div></section><section id="admin"><h2>04 / Authenticated Jenkins access</h2><p>The recovered Jenkins account had access to high-impact administrative functionality. Script Console access demonstrated that the compromised Jenkins account could execute commands on the controller host.</p><div class="source-note"><strong>Why this mattered:</strong> The attack crossed from application compromise into operating-system execution.</div></section><section id="privesc"><h2>05 / Privilege escalation</h2><p>Jenkins stored credential material in its credential store and retained the secret material needed to decrypt those records. Administrative access to the Jenkins controller made it possible to recover a privileged SSH private key from the Jenkins credential store.</p><p>The recovered key was then used for privileged SSH authentication, resulting in root access. The key material and flag values are intentionally omitted.</p></section><section id="evidence"><h2>06 / Evidence register</h2><div class="table-scroll"><table><thead><tr><th>ID</th><th>Stage</th><th>Evidence</th><th>Status</th></tr></thead><tbody><tr><td>EVD-001</td><td>Recon</td><td>SSH and Jenkins service discovery</td><td>Documented</td></tr><tr><td>EVD-002</td><td>Enumeration</td><td>Jenkins 2.441 observed</td><td>Documented</td></tr><tr><td>EVD-003</td><td>Initial access</td><td>Arbitrary file read confirmed</td><td>Documented</td></tr><tr><td>EVD-004</td><td>Credential access</td><td>Jenkins user hash recovered</td><td>Documented</td></tr><tr><td>EVD-005</td><td>Application access</td><td>Authenticated Jenkins session</td><td>Documented</td></tr><tr><td>EVD-006</td><td>Execution</td><td>Administrative command execution</td><td>Documented</td></tr><tr><td>EVD-007</td><td>Credential access</td><td>Privileged SSH credential recovered</td><td>Documented</td></tr><tr><td>EVD-008</td><td>Privilege escalation</td><td>Root SSH access</td><td>Documented</td></tr></tbody></table></div></section><section id="findings"><h2>07 / Findings & remediation</h2><h3>F-01 — Vulnerable Jenkins release</h3><p><strong>Severity:</strong> High</p><p>Jenkins was running a release affected by CVE-2024-23897.</p><ul><li>Upgrade Jenkins to a fixed release.</li><li>Disable CLI access as a temporary mitigation when immediate upgrade is not possible.</li><li>Restrict Jenkins exposure to trusted administrative networks.</li></ul><h3>F-02 — Crackable Jenkins password</h3><p><strong>Severity:</strong> High</p><p>A recovered bcrypt hash was susceptible to offline dictionary cracking.</p><ul><li>Require strong, unique passwords.</li><li>Use MFA or centralized identity where supported.</li><li>Rotate credentials exposed through application artifacts.</li></ul><h3>F-03 — Excessive administrative capability</h3><p><strong>Severity:</strong> High</p><p>The compromised Jenkins account had access to administrative functionality capable of host command execution.</p><ul><li>Restrict administrative scripting permissions.</li><li>Review Jenkins authorization and apply least privilege.</li></ul><h3>F-04 — Privileged SSH credential stored in Jenkins</h3><p><strong>Severity:</strong> Critical</p><p>The Jenkins credential store contained SSH key material capable of privileged host authentication.</p><ul><li>Do not store root-equivalent SSH credentials in CI/CD platforms.</li><li>Use scoped service accounts.</li><li>Rotate exposed keys and audit dependent systems.</li><li>Prefer short-lived credentials where feasible.</li></ul></section><section id="defender"><h2>08 / Defender perspective</h2><div class="table-scroll"><table><thead><tr><th>Attack stage</th><th>Telemetry</th><th>Detection opportunity</th></tr></thead><tbody><tr><td>Jenkins enumeration</td><td>Proxy / Jenkins access logs</td><td>Unusual CLI-related requests from untrusted sources</td></tr><tr><td>File read</td><td>Jenkins logs / WAF</td><td>Requests referencing sensitive controller paths</td></tr><tr><td>Jenkins login</td><td>Authentication / audit logs</td><td>Administrative login from an unusual source</td></tr><tr><td>Administrative execution</td><td>Process telemetry</td><td>Shell activity spawned by Jenkins or Java</td></tr><tr><td>Privileged SSH</td><td>auth.log / journald / EDR</td><td>Privileged key authentication from an unexpected source</td></tr></tbody></table></div></section><section id="lessons"><h2>09 / Lessons learned</h2><ul><li>CI/CD systems combine code, credentials, execution, and administration, making them high-value infrastructure.</li><li>A file-read vulnerability can become credential compromise when sensitive platform artifacts are readable.</li><li>Administrative scripting features materially increase blast radius after account compromise.</li><li>Storing root-equivalent credentials in Jenkins can collapse application compromise into host compromise.</li><li>Evidence and remediation should be documented alongside the attack path.</li></ul></section></article></div><footer class="journal-footer">Dylan Senez / D4RKGUNN3R · Authorized labs. Evidence before conclusions.<br><a href="../writeup-builder.html">Open the write-up builder</a> · <a href="../write-ups.html">Back to write-ups</a></footer></main></body></html>
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Builder — HTB Medium Linux | Dylan Senez</title>
+  <meta name="description" content="Evidence-driven Hack The Box Builder walkthrough covering Jenkins exposure, credential recovery, administrative access, and privileged compromise.">
+  <meta name="theme-color" content="#07111d">
+  <link rel="icon" href="../favicon.svg">
+  <link rel="stylesheet" href="../styles.css">
+  <link rel="stylesheet" href="../articles.css">
+  <link rel="stylesheet" href="../case-study.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a>
+    <nav aria-label="Primary navigation">
+      <a href="../index.html">Home</a>
+      <a href="../projects.html">Projects</a>
+      <a href="../write-ups.html">Write-ups</a>
+      <a href="../writeup-builder.html">Builder tool</a>
+    </nav>
+  </header>
+
+  <main id="main" class="journal case-study">
+    <section class="case-hero">
+      <p class="eyebrow">OFFENSIVE SECURITY / HACK THE BOX</p>
+      <h1>Builder.</h1>
+      <p class="case-deck">A retired Hack The Box Medium Linux machine demonstrating how an exposed Jenkins service can cascade into full compromise through vulnerable application behavior, credential exposure, administrative execution, and privileged credential misuse.</p>
+      <div class="case-badges"><span>RETIRED</span><span>MEDIUM</span><span>LINUX</span><span>JENKINS</span></div>
+    </section>
+
+    <section class="case-path">
+      <p class="eyebrow">ATTACK PATH</p>
+      <div class="path-row">
+        <span>Jenkins Enumeration</span><i>→</i><span>File Read</span><i>→</i><span>Credential Recovery</span><i>→</i><span>Authenticated Jenkins</span><i>→</i><span>Administrative Execution</span><i>→</i><span>Privileged Credential</span><i>→</i><span>Root</span>
+      </div>
+    </section>
+
+    <section class="case-snapshot">
+      <div><span>Platform</span><b>Hack The Box</b></div>
+      <div><span>Difficulty</span><b>Medium</b></div>
+      <div><span>OS</span><b>Linux</b></div>
+      <div><span>Status</span><b>Documented</b></div>
+    </section>
+
+    <div class="reading-layout">
+      <aside class="toc">
+        <a href="#overview">Overview</a>
+        <a href="#recon">Reconnaissance</a>
+        <a href="#access">Initial access</a>
+        <a href="#admin">Jenkins access</a>
+        <a href="#privesc">Privilege escalation</a>
+        <a href="#screenshots">Screenshots</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#findings">Findings</a>
+        <a href="#defender">Defender view</a>
+        <a href="#lessons">Lessons</a>
+      </aside>
+
+      <article class="article-body">
+        <section id="overview">
+          <h2>01 / Case overview</h2>
+          <div class="status-box">
+            <strong>Evidence standard</strong>
+            <p>Sensitive passwords, password hashes, SSH key material, and flag values are excluded. Any sensitive value is represented as <code>&lt;REDACTED&gt;</code>.</p>
+          </div>
+          <p>Builder highlights how a CI/CD platform can become a complete compromise path when it is internet-exposed, vulnerable, and trusted with privileged credentials. The assessment moved from service discovery to file-read capability, credential recovery, authenticated administrative access, and privileged host access.</p>
+          <h3>Outcome</h3>
+          <p>The documented path reached root over SSH. Hashes, passwords, private-key contents, and proof flags remain redacted in the public version.</p>
+          <h3>Skills demonstrated</h3>
+          <ul>
+            <li>Network and service enumeration</li>
+            <li>Jenkins attack-surface analysis</li>
+            <li>Application vulnerability validation</li>
+            <li>Offline password-cracking workflow</li>
+            <li>Authenticated Jenkins administration</li>
+            <li>Credential-store analysis</li>
+            <li>Privilege escalation and evidence-driven reporting</li>
+          </ul>
+        </section>
+
+        <section id="recon">
+          <h2>02 / Reconnaissance</h2>
+          <h3>Port and service scan</h3>
+          <pre><code>nmap -sVC -p- &lt;REDACTED&gt; -T3 --min-rate 5000</code></pre>
+          <h3>Observed result</h3>
+          <pre><code>22/tcp   open  ssh
+8080/tcp open  http    Jetty / Jenkins</code></pre>
+          <p>Browsing to <code>http://&lt;REDACTED&gt;:8080/</code> exposed a Jenkins instance. The interface disclosed the deployed Jenkins version and made the application the primary attack surface.</p>
+          <div class="source-note"><strong>Why this mattered:</strong> Jenkins became the primary application-layer target, while SSH remained the likely post-compromise access path.</div>
+        </section>
+
+        <section id="access">
+          <h2>03 / Initial access</h2>
+          <h3>Validate file-read exposure</h3>
+          <pre><code># Public report intentionally omits the exact exploit invocation.
+# Result: local Jenkins/controller files could be read.</code></pre>
+          <h3>Observed account context</h3>
+          <pre><code>jenkins:x:1000:1000::/var/jenkins_home:/bin/bash</code></pre>
+          <p>The file-read condition exposed local controller information and Jenkins user metadata. A stored password hash associated with a valid application account was recovered.</p>
+          <h3>Offline credential recovery</h3>
+          <pre><code># Hash value redacted
+&lt;REDACTED&gt;
+
+# Offline cracking workflow performed against a local wordlist
+# Recovered password: &lt;REDACTED&gt;</code></pre>
+          <p>The recovered credential was valid for Jenkins authentication. The actual hash and password remain redacted.</p>
+          <div class="source-note"><strong>Why this mattered:</strong> A file-read flaw became an account-compromise path because sensitive authentication material was stored in readable Jenkins artifacts.</div>
+        </section>
+
+        <section id="admin">
+          <h2>04 / Authenticated Jenkins access</h2>
+          <p>After authentication with the recovered user credential, Jenkins administrative functionality allowed command execution on the controller host.</p>
+          <h3>Command-execution validation</h3>
+          <pre><code>id
+whoami
+hostname
+pwd</code></pre>
+          <p>These validation commands confirmed host-level execution from the Jenkins administrative context.</p>
+          <div class="source-note"><strong>Why this mattered:</strong> The compromise crossed from application access into host-level execution.</div>
+        </section>
+
+        <section id="privesc">
+          <h2>05 / Privilege escalation</h2>
+          <p>Jenkins retained credential records and supporting secret material within its controller data. Administrative access exposed a privileged SSH credential stored by the application.</p>
+          <h3>Relevant Jenkins artifacts</h3>
+          <pre><code>/var/jenkins_home/credentials.xml
+/var/jenkins_home/secrets/master.key
+/var/jenkins_home/secrets/hudson.util.Secret</code></pre>
+          <p>The public write-up documents the relationship between these artifacts without publishing the recovered private key or the decryption procedure.</p>
+          <h3>Recovered private key</h3>
+          <pre><code>-----BEGIN OPENSSH PRIVATE KEY-----
+&lt;REDACTED&gt;
+-----END OPENSSH PRIVATE KEY-----</code></pre>
+          <h3>Privileged access validation</h3>
+          <pre><code># Privileged SSH credential used against the target
+# Account: root
+# Key material: &lt;REDACTED&gt;
+
+cat /root/root.txt
+&lt;REDACTED&gt;</code></pre>
+          <div class="source-note"><strong>Why this mattered:</strong> Storing privileged SSH key material in Jenkins collapsed application compromise directly into host compromise.</div>
+        </section>
+
+        <section id="screenshots">
+          <h2>06 / Screenshots</h2>
+          <p>Add screenshots as you finalize the published version. The placeholders below keep the page layout complete before evidence images are added.</p>
+          <div class="screenshot-grid">
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 1 — Nmap scan output / identified services</figcaption></figure>
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 2 — Jenkins dashboard and version evidence</figcaption></figure>
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 3 — File-read validation</figcaption></figure>
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 4 — Jenkins account artifact / hash discovery</figcaption></figure>
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 5 — Administrative command-execution validation</figcaption></figure>
+            <figure class="screenshot-card"><div class="screenshot-placeholder">Screenshot placeholder</div><figcaption>Figure 6 — Root shell or root proof with sensitive values redacted</figcaption></figure>
+          </div>
+        </section>
+
+        <section id="evidence">
+          <h2>07 / Evidence register</h2>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>ID</th><th>Stage</th><th>Evidence</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>EVD-001</td><td>Recon</td><td>SSH and Jenkins service discovery</td><td>Documented</td></tr>
+                <tr><td>EVD-002</td><td>Enumeration</td><td>Jenkins version observed</td><td>Documented</td></tr>
+                <tr><td>EVD-003</td><td>Initial access</td><td>Arbitrary file read confirmed</td><td>Documented</td></tr>
+                <tr><td>EVD-004</td><td>Credential access</td><td>Jenkins user hash recovered</td><td>Documented</td></tr>
+                <tr><td>EVD-005</td><td>Application access</td><td>Authenticated Jenkins session</td><td>Documented</td></tr>
+                <tr><td>EVD-006</td><td>Execution</td><td>Administrative command execution</td><td>Documented</td></tr>
+                <tr><td>EVD-007</td><td>Credential access</td><td>Privileged SSH credential recovered</td><td>Documented</td></tr>
+                <tr><td>EVD-008</td><td>Privilege escalation</td><td>Root SSH access</td><td>Documented</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="findings">
+          <h2>08 / Findings &amp; remediation</h2>
+          <h3>F-01 — Vulnerable Jenkins deployment</h3>
+          <p><strong>Severity:</strong> High</p>
+          <p>The Jenkins deployment permitted sensitive file-read behavior that exposed controller data.</p>
+          <ul><li>Upgrade Jenkins to a fixed release.</li><li>Restrict CLI exposure where not required.</li><li>Limit Jenkins access to trusted administrative networks.</li></ul>
+
+          <h3>F-02 — Recoverable Jenkins password</h3>
+          <p><strong>Severity:</strong> High</p>
+          <p>A recovered password hash was susceptible to offline cracking.</p>
+          <ul><li>Require strong, unique passwords.</li><li>Use MFA or centralized identity where supported.</li><li>Rotate credentials exposed through application artifacts.</li></ul>
+
+          <h3>F-03 — Excessive administrative capability</h3>
+          <p><strong>Severity:</strong> High</p>
+          <p>The compromised Jenkins account could access host-impacting administrative functionality.</p>
+          <ul><li>Restrict administrative scripting permissions.</li><li>Review role assignments and apply least privilege.</li></ul>
+
+          <h3>F-04 — Privileged SSH credential stored in Jenkins</h3>
+          <p><strong>Severity:</strong> Critical</p>
+          <p>Jenkins stored SSH key material capable of privileged host authentication.</p>
+          <ul><li>Do not store root-equivalent SSH keys in CI/CD systems.</li><li>Use scoped service accounts.</li><li>Rotate exposed keys and audit dependent systems.</li><li>Prefer short-lived credentials where possible.</li></ul>
+        </section>
+
+        <section id="defender">
+          <h2>09 / Defender perspective</h2>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>Attack stage</th><th>Telemetry</th><th>Detection opportunity</th></tr></thead>
+              <tbody>
+                <tr><td>Jenkins enumeration</td><td>Proxy / Jenkins access logs</td><td>Unusual CLI-related requests from untrusted sources</td></tr>
+                <tr><td>File read</td><td>Jenkins logs / WAF</td><td>Requests referencing sensitive controller paths</td></tr>
+                <tr><td>Jenkins login</td><td>Authentication / audit logs</td><td>Administrative login from an unusual source</td></tr>
+                <tr><td>Administrative execution</td><td>Process telemetry</td><td>Shell activity spawned by Jenkins or Java</td></tr>
+                <tr><td>Privileged SSH</td><td>auth.log / journald / EDR</td><td>Privileged key authentication from an unexpected source</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="lessons">
+          <h2>10 / Lessons learned</h2>
+          <ul>
+            <li>CI/CD systems are high-value targets because they centralize code, credentials, execution, and administration.</li>
+            <li>Application-layer file read can become credential compromise when sensitive artifacts are readable.</li>
+            <li>Administrative scripting features greatly increase blast radius after compromise.</li>
+            <li>Storing privileged SSH credentials in Jenkins can collapse application compromise into host compromise.</li>
+            <li>Evidence and remediation should be documented alongside the attack path.</li>
+          </ul>
+        </section>
+      </article>
+    </div>
+
+    <footer class="journal-footer">
+      Dylan Senez / D4RKGUNN3R · Authorized labs. Evidence before conclusions.<br>
+      <a href="../writeup-builder.html">Open the write-up builder</a> · <a href="../write-ups.html">Back to write-ups</a>
+    </footer>
+  </main>
+</body>
+</html>
