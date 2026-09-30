@@ -7,14 +7,7 @@ Multi-page terminal site for **Dylan Senez** (`d4rkgunn3r`).
 | File | Section |
 |---|---|
 | `index.html` | home |
-| `whoami.html` | whoami |
-| `tradecraft.html` | tradecraft |
-| `ops.html` | ops |
-| `research.html` | research |
-| `certs.html` | certs |
-| `education.html` | education |
 | `write-ups.html` | write-ups |
-| `contact.html` | contact |
 | `404.html` | not found |
 
 Shared: `styles.css` · `app.js` · favicons · `og.png`
