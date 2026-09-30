@@ -1,0 +1,6 @@
+# Security policy for Dylan Senez's portfolio and lab work.
+Contact: mailto:dylan.senez@outlook.com
+Expires: 2027-09-30T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://dylans7j.github.io/Portfolio/.well-known/security.txt
+Policy: https://dylans7j.github.io/Portfolio/

@@ -36,5 +36,33 @@
       "path": "investigations/INC-001-smb-authentication-failures.md",
       "images": []
     }
+  ],
+  "builder": {
+    "title": "Write-up builder",
+    "summary": "Use the local-first builder to structure machine notes around validated evidence before publishing them.",
+    "url": "./writeup-builder.html",
+    "linkText": "Open the write-up builder →"
+  },
+  "manual": [
+    {
+      "category": "machine",
+      "eyebrow": "OFFENSIVE SECURITY / HACK THE BOX / MEDIUM LINUX",
+      "title": "Builder: evidence-driven machine write-up",
+      "summary": "The first machine using the new case-study format: attack path, evidence register, findings, remediation, defender perspective, and documented validation status.",
+      "state": "Retired machine · documented walkthrough",
+      "tags": ["Linux", "HTB", "Offensive Security"],
+      "url": "./articles/htb-builder.html",
+      "linkText": "Open the case study →"
+    },
+    {
+      "category": "machine",
+      "eyebrow": "Hack The Box / Windows / 5 MIN READ",
+      "title": "Love: from URL checker to SYSTEM",
+      "summary": "A staging URL checker exposed application credentials; an authenticated upload provided a foothold, and Windows Installer policy enabled elevation.",
+      "state": "Retired machine · evidence reviewed",
+      "tags": ["Windows", "PHP", "SSRF"],
+      "url": "https://github.com/Dylans7j/HackTheBox-Walkthroughs/blob/main/love.md",
+      "linkText": "Read the walkthrough →"
+    }
   ]
 }
