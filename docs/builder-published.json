@@ -1,5 +1,23 @@
 [
   {
+    "slug": "cctv",
+    "title": "CCTV",
+    "summary": "Full compromise of an Easy Linux target themed around open-source CCTV software. A ZoneMinder deployment left default credentials in place, and an authenticated boolean-based blind SQL injection (CVE-2024-51482) dumped the application's bcrypt password hashes, one of which cracked offline to an SSH password. A tcpdump binary carrying the cap_net_raw capability allowed passive capture of plaintext credentials crossing an unencrypted Docker bridge, moving access to a second user. An internal motionEye instance, reachable only through an SSH local-forward, was then compromised through an authenticated OS command injection in a filename configuration field (CVE-2025-60787) that was guarded only by client-side JavaScript — yielding a root shell.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Linux",
+      "CVE-2024-51482 blind SQL injection",
+      "default credentials",
+      "bcrypt hash cracking",
+      "cleartext Docker-bridge traffic",
+      "cap_net_raw abuse",
+      "CVE-2025-60787 command injection",
+      "client-side validation bypass"
+    ]
+  },
+  {
     "slug": "nexus",
     "title": "Nexus",
     "summary": "Full compromise of a small Linux target through a chain of four linked weaknesses. A public careers page leaked an account-naming convention and a database password was still recoverable from a Git repository's history, giving authenticated access to a Krayin CRM. A public CVE turned that access into web-tier code execution as www-data, a reused credential moved the foothold to the jones system account, and a root-run Gitea \"template sync\" service was abused with a hand-crafted Git tree to write a sudoers rule — ending in root without ever exploiting the kernel.",
