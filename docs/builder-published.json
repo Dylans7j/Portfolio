@@ -1,0 +1,13 @@
+[
+  {
+    "slug": "nexus",
+    "title": "Nexus",
+    "summary": "This report documents an in-progress assessment of the Hack The Box machine Nexus at 10.129.234.54. It will record observed services, evidence-supported findings, security impact, and remediation. No scan output or technical validation evidence has been supplied yet.",
+    "category": "machine",
+    "status": "In progress",
+    "tags": [
+      "Hack The Box",
+      "Linux"
+    ]
+  }
+]
