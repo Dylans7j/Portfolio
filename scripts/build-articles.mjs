@@ -68,7 +68,7 @@ await writeFile(path.join(root,'content/build-manifest.json'),JSON.stringify({re
 // Support either GitHub Pages source directory without changing repository settings.
 await mkdir(path.join(root,'docs/articles'),{recursive:true});
 const manualLocal=(manifest.manual||[]).filter(m=>typeof m.url==='string'&&m.url.startsWith('./')&&m.url.endsWith('.html')).map(m=>m.url.slice(2));
-for(const file of ['write-ups.html','articles.css','articles.js','projects.html','projects.css','writeup-builder.html','writeup-builder.css','writeup-builder.js','writeup-publish.js','case-study.css',...manualLocal,...built.map(a=>`articles/${a.slug}.html`)]) await copyFile(path.join(root,file),path.join(root,'docs',file));
+for(const file of ['write-ups.html','articles.css','articles.js','projects.html','projects.css','writeup-builder.html','writeup-builder.css','writeup-builder.js','writeup-publish.js','writeup-template.json','writeup-template.md','case-study.css',...manualLocal,...built.map(a=>`articles/${a.slug}.html`)]) await copyFile(path.join(root,file),path.join(root,'docs',file));
 for (const dir of ['', 'docs']) {
   const sitemapPath=path.join(root,dir,'sitemap.xml');
   let sitemap=await readFile(sitemapPath,'utf8');

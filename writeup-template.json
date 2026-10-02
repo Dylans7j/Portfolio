@@ -1,0 +1,54 @@
+{
+  "$schema": "writeup-template/v1",
+  "fields": {
+    "title": "",
+    "platform": "Hack The Box",
+    "difficulty": "",
+    "os": "",
+    "status": "In progress",
+    "assessmentType": "Authorized laboratory assessment",
+    "lastReviewed": "",
+    "themes": "",
+    "summary": "",
+    "outcome": "",
+    "takeaway": "",
+    "attackPath": "",
+    "troubleshooting": "",
+    "defenderPerspective": "",
+    "detections": "",
+    "lessons": "",
+    "openQuestions": "",
+    "references": "",
+    "redactions": ""
+  },
+  "steps": [
+    {
+      "phase": "Reconnaissance",
+      "title": "",
+      "status": "Validated",
+      "environment": "Kali / attacker",
+      "evidenceId": "EVD-001",
+      "artifact": "",
+      "objective": "",
+      "command": "",
+      "result": "",
+      "analysis": "",
+      "why": "",
+      "screenshots": []
+    }
+  ],
+  "findings": [
+    {
+      "id": "F-1",
+      "title": "",
+      "severity": "Medium",
+      "status": "Validated",
+      "asset": "",
+      "description": "",
+      "impact": "",
+      "rootCause": "",
+      "remediation": "",
+      "validation": ""
+    }
+  ]
+}
