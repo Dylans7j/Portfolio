@@ -2,12 +2,16 @@
   {
     "slug": "nexus",
     "title": "Nexus",
-    "summary": "This report documents an in-progress assessment of the Hack The Box machine Nexus at 10.129.234.54. It will record observed services, evidence-supported findings, security impact, and remediation. No scan output or technical validation evidence has been supplied yet.",
+    "summary": "Full compromise of a small Linux target through a chain of four linked weaknesses. A public careers page leaked an account-naming convention and a database password was still recoverable from a Git repository's history, giving authenticated access to a Krayin CRM. A public CVE turned that access into web-tier code execution as www-data, a reused credential moved the foothold to the jones system account, and a root-run Gitea \"template sync\" service was abused with a hand-crafted Git tree to write a sudoers rule — ending in root without ever exploiting the kernel.",
     "category": "machine",
-    "status": "In progress",
+    "status": "Retired machine · validated walkthrough",
     "tags": [
       "Hack The Box",
-      "Linux"
+      "Linux",
+      "CWE-22 path traversal",
+      "credential reuse",
+      "git object internals",
+      "root-run automation abuse"
     ]
   }
 ]
