@@ -131,12 +131,15 @@
   const articleCSS = '.article-body{max-width:900px;margin:auto}.article-body pre{background:#0c1016;color:#e4eaf2;padding:20px;border-radius:8px;overflow:auto;white-space:pre}.article-body img{max-width:100%;height:auto}.article-body figure{margin:24px 0}.article-body p,.article-body li{overflow-wrap:anywhere}@media print{body{background:#fff;color:#000}.journal-hero .eyebrow{color:#333}.article-body pre{background:#f4f4f4;color:#111;border:1px solid #ccc}.builder-output,.site-header,.journal-footer,.skip-link{display:none!important}a{color:#000;text-decoration:none}figure{break-inside:avoid}h2,h3{break-after:avoid}}';
   function documentHTML(d, options = {}) {
     const base = options.base || siteBase;
+    // Standalone documents are used for print/PDF export inside an off-screen iframe,
+    // where loading="lazy" images never enter the viewport and so never load. Force eager there.
+    const imgLoading = options.standalone ? '' : ' loading="lazy"';
     const f = d.fields;
     const s = slug(f.title);
     const team = options.mode === 'team';
     const teamHead = team ? '<meta name="robots" content="noindex">' : '';
     const teamBanner = team ? '<aside class="team-banner" style="background:#7a1f1f;color:#fff;padding:12px 18px;font-weight:700;text-align:center">TEAM COPY — UNREDACTED. Do not publish or share outside the team.</aside>' : '';
-    const stepHTML = d.steps.map((step, i) => `<section><h2>${i + 1}. ${esc(step.phase)} — ${esc(step.title)}</h2><p>${esc(step.status)} · ${esc(step.environment)} · ${esc(step.evidenceId)}</p>${section('Artifact', step.artifact)}${section('Objective', step.objective)}<h3>Command / request</h3><pre><code>${esc(step.command)}</code></pre><h3>Observed result</h3><pre><code>${esc(step.result)}</code></pre>${section('Analysis', step.analysis)}${section('Why this mattered', step.why)}${(step.screenshots || []).map(image => image.src ? `<figure><img src="${esc(image.src)}" alt="${esc(image.caption || image.name)}" loading="lazy"><figcaption>${esc(image.caption)}</figcaption></figure>` : '').join('')}</section>`).join('');
+    const stepHTML = d.steps.map((step, i) => `<section><h2>${i + 1}. ${esc(step.phase)} — ${esc(step.title)}</h2><p>${esc(step.status)} · ${esc(step.environment)} · ${esc(step.evidenceId)}</p>${section('Artifact', step.artifact)}${section('Objective', step.objective)}<h3>Command / request</h3><pre><code>${esc(step.command)}</code></pre><h3>Observed result</h3><pre><code>${esc(step.result)}</code></pre>${section('Analysis', step.analysis)}${section('Why this mattered', step.why)}${(step.screenshots || []).map(image => image.src ? `<figure><img src="${esc(image.src)}" alt="${esc(image.caption || image.name)}"${imgLoading}><figcaption>${esc(image.caption)}</figcaption></figure>` : '').join('')}</section>`).join('');
     const findings = d.findings.map((x, i) => `<section><h3>${esc(x.id || 'F-' + (i + 1))} — ${esc(x.title)}</h3><p>${esc(x.severity)} · ${esc(x.status)} · ${esc(x.asset)}</p>${section('Description', x.description)}${section('Impact', x.impact)}${section('Root cause', x.rootCause)}<h4>Remediation</h4>${list(x.remediation)}<h4>Validation</h4>${list(x.validation)}</section>`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${teamHead}<title>${esc(f.title)} — Dylan Senez</title><meta name="description" content="${esc(f.summary)}"><link rel="canonical" href="${base}articles/${s}.html"><link rel="stylesheet" href="${base}styles.css"><link rel="stylesheet" href="${base}articles.css"><style>${articleCSS}</style></head><body>${teamBanner}<main class="journal"><a href="${base}write-ups.html">← All writeups</a><header class="journal-hero"><p class="eyebrow">${esc(f.platform)} / ${esc(f.difficulty)} / ${esc(f.os)}</p><h1>${esc(f.title)}</h1>${paragraph(f.summary)}<p>${esc(f.status)} · ${esc(f.assessmentType)} · Reviewed: ${esc(f.lastReviewed || 'Not recorded')}</p><p>Dylan Senez / D4RKGUNN3R</p>${paragraph(f.themes)}</header><article class="article-body"><h2>Case overview</h2>${section('Outcome', f.outcome)}${section('Key takeaway', f.takeaway)}<p>Validated steps were directly reproduced. Documented steps are supported by preserved artifacts. Staged steps remain incomplete or await evidence.</p><h2>Attack path</h2>${list(f.attackPath)}${stepHTML}${findings ? '<h2>Findings & remediation</h2>' + findings : ''}${f.analysisSummary ? '<h2>Analysis</h2>' + paragraph(f.analysisSummary) : ''}${f.remediationSummary ? '<h2>Remediation</h2>' + list(f.remediationSummary) : ''}<h2>Defender perspective</h2>${paragraph(f.defenderPerspective)}<h3>Detection opportunities</h3>${list(f.detections)}<h2>Lessons learned</h2>${list(f.lessons)}<h3>Open questions</h3>${list(f.openQuestions)}${lines(f.troubleshooting).length ? '<h2>Troubleshooting & success factors</h2>' + list(f.troubleshooting) : ''}<h2>References</h2>${list(f.references)}</article><footer class="journal-footer"><a href="${base}write-ups.html">Back to writeups</a></footer></main></body></html>`;
   }
@@ -216,8 +219,16 @@
     doc.close();
 
     await waitForLoad(win, doc, 4000);
+    // Belt-and-braces: promote any lazy image to eager, and never let a stalled
+    // image block the print dialog.
+    doc.querySelectorAll('img').forEach(img => { if (img.loading === 'lazy') img.loading = 'eager'; });
     const pending = [...doc.images].filter(img => !img.complete);
-    await Promise.all(pending.map(img => new Promise(resolve => { img.onload = img.onerror = resolve; })));
+    if (pending.length) {
+      await Promise.race([
+        Promise.all(pending.map(img => new Promise(resolve => { img.onload = img.onerror = resolve; }))),
+        new Promise(resolve => setTimeout(resolve, 4000))
+      ]);
+    }
     await new Promise(resolve => setTimeout(resolve, 300));
 
     let printed = false;
