@@ -175,22 +175,63 @@
     const link = document.createElement('a'); link.href = url; link.download = filename; link.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  // Wait until the printable document (styles, fonts) is ready to render.
+  function waitForLoad(win, doc, timeout) {
+    return new Promise(resolve => {
+      let settled = false;
+      const finish = () => { if (!settled) { settled = true; resolve(); } };
+      if (doc.readyState === 'complete') return finish();
+      win.addEventListener('load', finish, { once: true });
+      doc.addEventListener('DOMContentLoaded', () => setTimeout(finish, 250), { once: true });
+      setTimeout(finish, timeout || 3000);
+    });
+  }
+  function printViaPopup(html) {
+    const popup = window.open('', '_blank');
+    if (!popup) throw new Error('Pop-up blocked — allow pop-ups for this site, then try Save as PDF again');
+    popup.document.open();
+    popup.document.write(html);
+    popup.document.close();
+    const go = () => { try { popup.focus(); popup.print(); } catch (error) { /* user can print manually */ } };
+    setTimeout(go, 600);
+  }
   async function exportPDF(mode) {
     const { html } = await prepare(mode);
     const frame = document.createElement('iframe');
     frame.setAttribute('aria-hidden', 'true');
-    frame.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0;visibility:hidden';
+    frame.setAttribute('title', 'Printable writeup');
+    // Chrome prints an iframe blank when it is display:none, visibility:hidden, or 0x0.
+    // Keep it rendered but parked off-screen at A4 pixel size so window.print() works.
+    frame.style.cssText = 'position:fixed;left:-10000px;top:0;width:794px;height:1123px;border:0;background:#ffffff';
     document.body.append(frame);
-    await new Promise(resolve => {
-      frame.onload = () => resolve();
-      frame.srcdoc = html;
-    });
+
     const win = frame.contentWindow;
-    await new Promise(resolve => setTimeout(resolve, 150));
-    win.focus(); win.print();
-    const cleanup = () => setTimeout(() => frame.remove(), 500);
-    win.addEventListener('afterprint', cleanup);
-    setTimeout(cleanup, 60000);
+    const doc = frame.contentDocument || (win && win.document);
+    if (!doc) { frame.remove(); printViaPopup(html); return; }
+
+    // document.write handles large payloads (e.g. multi-MB embedded screenshots)
+    // more reliably than the srcdoc attribute.
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    await waitForLoad(win, doc, 4000);
+    const pending = [...doc.images].filter(img => !img.complete);
+    await Promise.all(pending.map(img => new Promise(resolve => { img.onload = img.onerror = resolve; })));
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    let printed = false;
+    const cleanup = () => setTimeout(() => frame.remove(), 1500);
+    try {
+      win.addEventListener('afterprint', cleanup, { once: true });
+      setTimeout(cleanup, 120000);
+      win.focus();
+      win.print();
+      printed = true;
+    } catch (error) {
+      printed = false;
+    }
+    if (!printed) { frame.remove(); printViaPopup(html); }
   }
 
   // ---- Wiring ------------------------------------------------------------------
@@ -218,7 +259,7 @@
   $('#copy-markdown').onclick = async () => { try { await navigator.clipboard.writeText(render()); state.textContent = previewMode() === 'team' ? 'Team Markdown copied' : 'Public Markdown copied'; } catch (error) { state.textContent = 'Copy failed'; } };
   $('#download-markdown').onclick = () => { const d = visibleData(); download(slug(d.fields.title) + '.md', md(d), 'text/markdown'); };
   $('#save-pdf').onclick = async () => {
-    try { state.textContent = 'Preparing PDF…'; await exportPDF(previewMode()); state.textContent = 'Print dialog opened'; }
+    try { state.textContent = 'Preparing PDF…'; await exportPDF(previewMode()); state.textContent = 'Print dialog opened — choose "Save as PDF"'; }
     catch (error) { state.textContent = error.message; }
   };
   $('#download-team-md').onclick = async () => {
