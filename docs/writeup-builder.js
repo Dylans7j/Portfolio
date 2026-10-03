@@ -359,8 +359,8 @@
       (stored.findings || []).forEach(finding => add('#finding-template', finding));
       stampReviewed(); fillMissingEvidenceIds(); renum();
       state.textContent = 'Saved locally';
-    } else add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' });
-  } catch (error) { add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' }); }
+    } else { add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' }); stampReviewed(); fillMissingEvidenceIds(); renum(); }
+  } catch (error) { add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' }); stampReviewed(); fillMissingEvidenceIds(); renum(); }
 
   window.writeupBuilder = { data, md, slug, parseRules, redactText, deepRedact, collectImages, documentHTML, prepare, exportPDF, download, previewMode };
   render();
