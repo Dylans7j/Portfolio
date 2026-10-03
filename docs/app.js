@@ -5,7 +5,7 @@ const nodeData = {
     statusClass: "confirmed",
     title: "Kali Linux",
     summary: "Attack workstation used to generate controlled network and authentication activity inside the isolated lab.",
-    network: "VMnet7: 192.168.70.10",
+    network: "VMnet7: 192.0.2.10",
     evidence: "Nmap AD service discovery, NetExec SMB/LDAP testing, and Sentinel validation.",
     tags: ["Nmap", "NetExec", "Linux"]
   },
@@ -74,7 +74,7 @@ const cases = {
       "Validated telemetry in Sentinel and established SPLUNK-01 as a second analysis platform."
     ],
     evidence: [
-      "Kali connected to the VMnet7 lab at 192.168.70.10/24.",
+      "Kali connected to the VMnet7 lab at 192.0.2.10/24.",
       "Observed ports 53, 88, 135, 139, 389, and 445 on the domain controller during service discovery.",
       "Sentinel data and custom KQL work documented; Splunk service reachability independently checked.",
       "CrowdSec was removed from the current design and is not presented as deployed."
