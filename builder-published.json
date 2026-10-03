@@ -1,5 +1,22 @@
 [
   {
+    "slug": "logging",
+    "title": "Logging",
+    "summary": "A Windows Active Directory domain controller (logging.htb) runs WSUS alongside the usual AD services. Starting from a low-privilege domain account, a service-account password leaked in a log file on an SMB share leads to shadow-credential abuse and a WinRM foothold. From there, a writable scheduled-task payload directory is hijacked for a lateral move to a user who can enroll certificates, and a fake WSUS server - fed by a poisoned DNS record and a certificate for the WSUS hostname - delivers a SYSTEM shell.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Windows",
+      "Active Directory",
+      "WSUS",
+      "certificates",
+      "DNS poisoning",
+      "scheduled tasks",
+      "shadow credentials"
+    ]
+  },
+  {
     "slug": "blue",
     "title": "Blue",
     "summary": "Blue is a Windows 7 Professional SP1 x64 host (HARIS-PC, workgroup WORKGROUP) exposing MSRPC on 135 and SMB on 139/445. Enumeration identified an SMBv1 stack with message signing disabled and the guest account active. A vulnerability check confirmed MS17-010 (EternalBlue), and the Metasploit module exploit/windows/smb/ms17_010_eternalblue produced an unauthenticated remote kernel pool overwrite. The first exploit run failed with the default 12 groom allocations and the module automatically retried with 17 allocations, completing the ETERNALBLUE overwrite and delivering a Meterpreter stage that yielded an NT AUTHORITY\\SYSTEM session. A Windows shell then confirmed Administrator Desktop access and the root proof was read.",
