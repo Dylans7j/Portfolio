@@ -11,6 +11,31 @@
   const slug = value => (value || 'security-writeup').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'security-writeup';
   const bul = value => lines(value).map(x => '- ' + x).join('\n') || '- None recorded';
   const fileSlug = value => (value || 'screenshot.png').toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9._-]/g, '');
+  const nz = value => (value || '').trim();
+  const stepTitle = (step, index) => nz(step.title) || ((nz(step.phase) || 'Step') + ' step ' + (index + 1));
+  function nextEvidenceId() {
+    let max = 0;
+    stepsBox.querySelectorAll('[data-field="evidenceId"]').forEach(input => {
+      const m = String(input.value || '').match(/EVD-(\d+)/i);
+      if (m) max = Math.max(max, parseInt(m[1], 10));
+    });
+    return 'EVD-' + String(max + 1).padStart(3, '0');
+  }
+  function fillMissingEvidenceIds() {
+    stepsBox.querySelectorAll('[data-field="evidenceId"]').forEach((input, i) => { if (!nz(input.value)) input.value = 'EVD-' + String(i + 1).padStart(3, '0'); });
+  }
+  function migrateStep(step) {
+    if (step && nz(step.objective) && !nz(step.why)) step.why = step.objective;
+    if (step) delete step.objective;
+    return step;
+  }
+  function stampReviewed() {
+    const input = form.elements.namedItem('lastReviewed');
+    if (input && !nz(input.value)) {
+      const now = new Date();
+      input.value = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    }
+  }
 
   // ---- HTML helpers shared with the publisher ---------------------------------
   const esc = value => String(value == null ? '' : value).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -46,7 +71,14 @@
 
   // ---- UI ---------------------------------------------------------------------
   function renum() {
-    [...stepsBox.children].forEach((card, i) => { card.querySelector('.item-number').textContent = String(i + 1).padStart(2, '0'); });
+    [...stepsBox.children].forEach((card, i) => {
+      card.querySelector('.item-number').textContent = String(i + 1).padStart(2, '0');
+      const title = card.querySelector('h3');
+      if (title) title.textContent = stepTitle(read(card), i);
+      const chip = card.querySelector('.evidence-chip');
+      const evInput = card.querySelector('[data-field="evidenceId"]');
+      if (chip) chip.textContent = evInput ? (nz(evInput.value) || 'EVD-000') : '';
+    });
     [...findingsBox.children].forEach((card, i) => { card.querySelector('.item-number').textContent = 'F-' + String(i + 1).padStart(2, '0'); });
   }
   function shotData(card) {
@@ -105,8 +137,16 @@
     d.steps.forEach(step => { if (counts[step.status] !== undefined) counts[step.status]++; });
     let out = '# ' + safe(f.title) + '\n\n## ' + safe(f.platform) + ' — ' + safe(f.difficulty) + ' — ' + safe(f.os) + '\n\n**Author:** Dylan Senez / D4RKGUNN3R  \n**Status:** ' + safe(f.status) + '  \n**Assessment type:** ' + safe(f.assessmentType) + '  \n**Last reviewed:** ' + safe(f.lastReviewed) + '  \n**Primary themes:** ' + safe(f.themes) + '\n\n> **Evidence standard:** Validated steps were directly reproduced. Documented steps are supported by preserved artifacts. Staged steps remain incomplete or await evidence.\n\n---\n\n## 01 / CASE OVERVIEW\n\n' + safe(f.summary) + '\n\n### Outcome\n\n' + safe(f.outcome) + '\n\n### Key takeaway\n\n' + safe(f.takeaway) + '\n\n### Validation summary\n\n| Status | Count |\n|---|---:|\n| Validated | ' + counts.Validated + ' |\n| Documented | ' + counts.Documented + ' |\n| Staged | ' + counts.Staged + ' |\n\n## 02 / ATTACK PATH\n\n' + fence + 'text\n' + (atk.length ? atk.join('\n      |\n      v\n') : '[Add attack-path stages]') + '\n' + fence + '\n';
     let n = 3;
-    for (const step of d.steps) {
-      out += '\n## ' + String(n++).padStart(2, '0') + ' / ' + safe(step.phase).toUpperCase() + '\n\n### ' + safe(step.title) + '\n\n**Status:** ' + safe(step.status) + '  \n**Environment:** ' + safe(step.environment) + '  \n**Evidence ID:** ' + safe(step.evidenceId) + '  \n**Artifact:** ' + safe(step.artifact) + '\n\n#### Objective\n\n' + safe(step.objective) + '\n\n#### Command / request\n\n' + fence + 'bash\n' + (step.command || '') + '\n' + fence + '\n\n#### Observed result\n\n' + fence + 'text\n' + (step.result || '') + '\n' + fence + '\n\n#### Analysis\n\n' + safe(step.analysis) + '\n\n> **Why this mattered:** ' + safe(step.why).replace(/\n+/g, ' ') + '\n';
+    for (const [index, step] of d.steps.entries()) {
+      const meta = [];
+      if (nz(step.environment)) meta.push('**Environment:** ' + safe(step.environment));
+      if (nz(step.evidenceId)) meta.push('**Evidence ID:** ' + safe(step.evidenceId));
+      if (nz(step.artifact)) meta.push('**Artifact:** ' + safe(step.artifact));
+      out += '\n## ' + String(n++).padStart(2, '0') + ' / ' + safe(step.phase).toUpperCase() + '\n\n### ' + safe(stepTitle(step, index)) + '\n\n**Status:** ' + safe(step.status) + (meta.length ? '  \n' + meta.join('  \n') : '') + '\n';
+      if (nz(step.command)) out += '\n#### Command / request\n\n' + fence + 'bash\n' + step.command + '\n' + fence + '\n';
+      if (nz(step.result)) out += '\n#### Observed result\n\n' + fence + 'text\n' + step.result + '\n' + fence + '\n';
+      if (nz(step.analysis)) out += '\n#### Analysis\n\n' + safe(step.analysis) + '\n';
+      if (nz(step.why)) out += '\n> **Why this mattered:** ' + safe(step.why).replace(/\n+/g, ' ') + '\n';
       if ((step.screenshots || []).length) {
         out += '\n#### Screenshot evidence\n\n';
         step.screenshots.forEach((shot, i) => { const caption = shot.caption || ('Evidence screenshot ' + (i + 1)); const src = shot.src && shot.src.startsWith('data:') ? srcName(shot) : 'assets/screenshots/' + shot.name; out += '![' + caption + '](' + src + ')\n\n*' + caption + '*\n\n'; });
@@ -139,7 +179,10 @@
     const team = options.mode === 'team';
     const teamHead = team ? '<meta name="robots" content="noindex">' : '';
     const teamBanner = team ? '<aside class="team-banner" style="background:#7a1f1f;color:#fff;padding:12px 18px;font-weight:700;text-align:center">TEAM COPY — UNREDACTED. Do not publish or share outside the team.</aside>' : '';
-    const stepHTML = d.steps.map((step, i) => `<section><h2>${i + 1}. ${esc(step.phase)} — ${esc(step.title)}</h2><p>${esc(step.status)} · ${esc(step.environment)} · ${esc(step.evidenceId)}</p>${section('Artifact', step.artifact)}${section('Objective', step.objective)}<h3>Command / request</h3><pre><code>${esc(step.command)}</code></pre><h3>Observed result</h3><pre><code>${esc(step.result)}</code></pre>${section('Analysis', step.analysis)}${section('Why this mattered', step.why)}${(step.screenshots || []).map(image => image.src ? `<figure><img src="${esc(image.src)}" alt="${esc(image.caption || image.name)}"${imgLoading}><figcaption>${esc(image.caption)}</figcaption></figure>` : '').join('')}</section>`).join('');
+    const stepHTML = d.steps.map((step, i) => {
+      const meta = [step.status, step.environment, step.evidenceId].filter(nz).map(esc).join(' · ');
+      return `<section><h2>${i + 1}. ${esc(step.phase)} — ${esc(stepTitle(step, i))}</h2>${meta ? `<p>${meta}</p>` : ''}${section('Artifact', step.artifact)}${nz(step.command) ? '<h3>Command / request</h3><pre><code>' + esc(step.command) + '</code></pre>' : ''}${nz(step.result) ? '<h3>Observed result</h3><pre><code>' + esc(step.result) + '</code></pre>' : ''}${section('Analysis', step.analysis)}${section('Why this mattered', step.why)}${(step.screenshots || []).map(image => image.src ? `<figure><img src="${esc(image.src)}" alt="${esc(image.caption || image.name)}"${imgLoading}><figcaption>${esc(image.caption)}</figcaption></figure>` : '').join('')}</section>`;
+    }).join('');
     const findings = d.findings.map((x, i) => `<section><h3>${esc(x.id || 'F-' + (i + 1))} — ${esc(x.title)}</h3><p>${esc(x.severity)} · ${esc(x.status)} · ${esc(x.asset)}</p>${section('Description', x.description)}${section('Impact', x.impact)}${section('Root cause', x.rootCause)}<h4>Remediation</h4>${list(x.remediation)}<h4>Validation</h4>${list(x.validation)}</section>`).join('');
     return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">${teamHead}<title>${esc(f.title)} — Dylan Senez</title><meta name="description" content="${esc(f.summary)}"><link rel="canonical" href="${base}articles/${s}.html"><link rel="stylesheet" href="${base}styles.css"><link rel="stylesheet" href="${base}articles.css"><style>${articleCSS}</style></head><body>${teamBanner}<main class="journal"><a href="${base}write-ups.html">← All writeups</a><header class="journal-hero"><p class="eyebrow">${esc(f.platform)} / ${esc(f.difficulty)} / ${esc(f.os)}</p><h1>${esc(f.title)}</h1>${paragraph(f.summary)}<p>${esc(f.status)} · ${esc(f.assessmentType)} · Reviewed: ${esc(f.lastReviewed || 'Not recorded')}</p><p>Dylan Senez / D4RKGUNN3R</p>${paragraph(f.themes)}</header><article class="article-body"><h2>Case overview</h2>${section('Outcome', f.outcome)}${section('Key takeaway', f.takeaway)}<p>Validated steps were directly reproduced. Documented steps are supported by preserved artifacts. Staged steps remain incomplete or await evidence.</p><h2>Attack path</h2>${list(f.attackPath)}${stepHTML}${findings ? '<h2>Findings & remediation</h2>' + findings : ''}${f.analysisSummary ? '<h2>Analysis</h2>' + paragraph(f.analysisSummary) : ''}${f.remediationSummary ? '<h2>Remediation</h2>' + list(f.remediationSummary) : ''}<h2>Defender perspective</h2>${paragraph(f.defenderPerspective)}<h3>Detection opportunities</h3>${list(f.detections)}<h2>Lessons learned</h2>${list(f.lessons)}<h3>Open questions</h3>${list(f.openQuestions)}${lines(f.troubleshooting).length ? '<h2>Troubleshooting & success factors</h2>' + list(f.troubleshooting) : ''}<h2>References</h2>${list(f.references)}</article><footer class="journal-footer"><a href="${base}write-ups.html">Back to writeups</a></footer></main></body></html>`;
   }
@@ -258,12 +301,17 @@
     form.reset();
     stepsBox.innerHTML = ''; findingsBox.innerHTML = '';
     add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' });
+    stampReviewed(); fillMissingEvidenceIds(); renum();
     render();
   }
 
-  $('#add-step').onclick = () => { add('#step-template'); render(); markUnsaved(); };
+  $('#add-step').onclick = () => { add('#step-template', { evidenceId: nextEvidenceId() }); render(); markUnsaved(); };
   $('#add-finding').onclick = () => { add('#finding-template'); render(); markUnsaved(); };
   form.oninput = form.onchange = () => { render(); markUnsaved(); };
+  stepsBox.addEventListener('input', event => {
+    const field = event.target && event.target.dataset ? event.target.dataset.field : null;
+    if (field === 'title' || field === 'phase' || field === 'evidenceId') renum();
+  });
   const modeSelect = $('#preview-mode');
   if (modeSelect) modeSelect.onchange = render;
   $('#save-draft').onclick = () => { localStorage.setItem(key, JSON.stringify(data())); state.textContent = 'Saved locally'; };
@@ -290,9 +338,10 @@
       const template = await response.json();
       form.reset(); stepsBox.innerHTML = ''; findingsBox.innerHTML = '';
       Object.entries(template.fields || {}).forEach(([field, value]) => { const element = form.elements.namedItem(field); if (element) element.value = value || ''; });
-      (template.steps || []).forEach(step => add('#step-template', step));
+      (template.steps || []).forEach(step => add('#step-template', migrateStep(step)));
       (template.findings || []).forEach(finding => add('#finding-template', finding));
       if (!(template.steps || []).length) add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' });
+      stampReviewed(); fillMissingEvidenceIds(); renum();
       render(); state.textContent = 'Template loaded';
     } catch (error) { blank(); state.textContent = error.message + ' — blank scaffold loaded'; }
   };
@@ -306,8 +355,9 @@
     const stored = JSON.parse(localStorage.getItem(key) || localStorage.getItem(oldKey) || 'null');
     if (stored) {
       Object.entries(stored.fields || {}).forEach(([field, value]) => { const element = form.elements.namedItem(field); if (element) element.value = value || ''; });
-      (stored.steps || []).forEach(step => add('#step-template', step));
+      (stored.steps || []).forEach(step => add('#step-template', migrateStep(step)));
       (stored.findings || []).forEach(finding => add('#finding-template', finding));
+      stampReviewed(); fillMissingEvidenceIds(); renum();
       state.textContent = 'Saved locally';
     } else add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' });
   } catch (error) { add('#step-template', { phase: 'Reconnaissance', status: 'Validated', evidenceId: 'EVD-001' }); }
