@@ -1,5 +1,133 @@
 [
   {
+    "slug": "blue",
+    "title": "Blue",
+    "summary": "Blue is a Windows 7 Professional SP1 x64 host (HARIS-PC, workgroup WORKGROUP) exposing MSRPC on 135 and SMB on 139/445. Enumeration identified an SMBv1 stack with message signing disabled and the guest account active. A vulnerability check confirmed MS17-010 (EternalBlue), and the Metasploit module exploit/windows/smb/ms17_010_eternalblue produced an unauthenticated remote kernel pool overwrite. The first exploit run failed with the default 12 groom allocations and the module automatically retried with 17 allocations, completing the ETERNALBLUE overwrite and delivering a Meterpreter stage that yielded an NT AUTHORITY\\SYSTEM session. A Windows shell then confirmed Administrator Desktop access and the root proof was read.",
+    "category": "machine",
+    "status": "Retired",
+    "tags": [
+      "Hack The Box",
+      "Windows",
+      "SMB enumeration on Windows 7 SP1",
+      "MS17-010 EternalBlue kernel pool corruption",
+      "Metasploit groom-allocation retry",
+      "unauthenticated SYSTEM session",
+      "disabled SMB message signing"
+    ]
+  },
+  {
+    "slug": "legacy",
+    "title": "Legacy",
+    "summary": "Legacy is a Windows XP host (LEGACY, workgroup HTB) exposing SMB on 139/445 with SMBv1 enabled and SMB message signing disabled. Service detection and Nmap vuln scripts confirmed both MS08-067 (CVE-2008-4250) and MS17-010 (CVE-2017-0143). Vulnerability detection alone is not treated as proof of a SYSTEM session: the retained Metasploit ms08_067_netapi attempt used Automatic Targeting, failed to determine the exact service pack, and created no session, so manual target selection (XP SP2/SP3 with the appropriate NX setting and SMBPIPE=SRVSVC) or a pivot to the MS17-010 path was planned. Proof artifacts for the user and root flags are recorded.",
+    "category": "machine",
+    "status": "Retired",
+    "tags": [
+      "Hack The Box",
+      "Windows",
+      "Legacy SMBv1 on Windows XP",
+      "MS08-067 and MS17-010 vulnerability detection",
+      "Metasploit target-selection troubleshooting",
+      "out-of-support platform"
+    ]
+  },
+  {
+    "slug": "jeeves",
+    "title": "Jeeves",
+    "summary": "Jeeves is a Windows host exposing IIS on 80, MSRPC on 135, SMB on 445 and a Jetty service on 50000. Enumeration of the Jetty context led to a foothold whose Jenkins workspace and an exfiltrated KeePass database (CEH.kdbx) were recovered. The KeePass master password was cracked offline and the vault exposed a long hexadecimal secret that was used as a Windows credential. A pass-the-hash exchange with the Administrator account produced a SYSTEM-level Windows shell, and the root flag was stored inside an NTFS Alternate Data Stream on the Administrator's desktop.",
+    "category": "machine",
+    "status": "Retired",
+    "tags": [
+      "Hack The Box",
+      "Windows",
+      "IIS/Jetty enumeration",
+      "SMB and MSRPC profiling",
+      "KeePass (.kdbx) credential recovery",
+      "pass-the-hash to Administrator",
+      "NTFS Alternate Data Streams"
+    ]
+  },
+  {
+    "slug": "union",
+    "title": "Union",
+    "summary": "Union exposes a single nginx service on port 80 running a PHP tournament application. The player parameter of index.php is vulnerable to SQL injection, but server-side filters defeat automated tooling, so UNION statements were crafted manually to enumerate the schema, dump a flag value and then read files with load_file(). The application's PHP configuration disclosed MySQL credentials that were reused to log in over SSH, a port opened earlier by submitting the extracted flag. Once on the host, the source of firewall.php showed the X-Forwarded-For header is concatenated into a shell command, enabling command injection and a reverse shell as www-data, whose sudo rights then granted root.",
+    "category": "machine",
+    "status": "Retired",
+    "tags": [
+      "Hack The Box",
+      "Linux",
+      "Web SQL injection with WAF filters",
+      "manual UNION extraction",
+      "PHP config credential disclosure",
+      "SSH access",
+      "X-Forwarded-For command injection",
+      "excessive sudo privileges"
+    ]
+  },
+  {
+    "slug": "shocker",
+    "title": "Shocker",
+    "summary": "A single exposed Apache CGI script at /cgi-bin/user.sh sits on top of an unpatched bash, making the host vulnerable to Shellshock (CVE-2014-6271). A crafted User-Agent header executes commands as the web user shelly with no authentication. From there a passwordless sudo entry for /usr/bin/perl converts the web shell into an instant root shell.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Linux",
+      "Shellshock",
+      "CGI",
+      "sudo abuse",
+      "Perl",
+      "CVE-2014-6271"
+    ]
+  },
+  {
+    "slug": "broker",
+    "title": "Broker",
+    "summary": "An exposed Apache ActiveMQ 5.15.15 message broker is vulnerable to CVE-2023-46604, an unauthenticated OpenWire deserialization flaw that yields remote code execution. Metasploit delivers a malicious Spring XML object to port 61616 and returns a shell as the activemq service user. A passwordless sudo rule for the nginx binary then escalates to root by loading an attacker-controlled configuration.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Linux",
+      "ActiveMQ",
+      "deserialization",
+      "CVE-2023-46604",
+      "sudo abuse",
+      "nginx"
+    ]
+  },
+  {
+    "slug": "beep",
+    "title": "Beep",
+    "summary": "An obsolete Elastix/FreePBX telephony stack exposes a very wide legacy footprint: Apache 2.2.3, Webmin 1.570, an Asterisk Manager interface, and several cleartext mail ports. The vtigercrm component ships graph.php with a current_language parameter vulnerable to directory traversal, allowing arbitrary file reads. Reading /etc/amportal.conf discloses reusable PBX credentials, which authenticate SSH as root over legacy key-exchange algorithms.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Linux",
+      "Elastix",
+      "FreePBX",
+      "LFI",
+      "telephony",
+      "legacy stack"
+    ]
+  },
+  {
+    "slug": "search",
+    "title": "Search",
+    "summary": "A Windows Active Directory domain controller exposes IIS, LDAP, Kerberos and SMB. Kerberoasting a service account yields a weak password that a domain user has reused, granting read/write access to a redirected-folders share. That share holds a phishing spreadsheet full of credentials, a crackable client certificate usable for PKINIT authentication, and a CA backup. Recovered credentials ultimately permit a remote administrator session.",
+    "category": "machine",
+    "status": "Retired machine · validated walkthrough",
+    "tags": [
+      "Hack The Box",
+      "Windows",
+      "Active Directory",
+      "Kerberoasting",
+      "certificates",
+      "SMB shares",
+      "privilege escalation"
+    ]
+  },
+  {
     "slug": "cctv",
     "title": "CCTV",
     "summary": "Full compromise of an Easy Linux target themed around open-source CCTV software. A ZoneMinder deployment left default credentials in place, and an authenticated boolean-based blind SQL injection (CVE-2024-51482) dumped the application's bcrypt password hashes, one of which cracked offline to an SSH password. A tcpdump binary carrying the cap_net_raw capability allowed passive capture of plaintext credentials crossing an unencrypted Docker bridge, moving access to a second user. An internal motionEye instance, reachable only through an SSH local-forward, was then compromised through an authenticated OS command injection in a filename configuration field (CVE-2025-60787) that was guarded only by client-side JavaScript — yielding a root shell.",
