@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Dylan Senez's cybersecurity portfolio: SOC operations, Active Directory lab work, detection engineering, DFIR, and authorized offensive-security research." />
+    <meta name="description" content="Dylan Senez's cybersecurity portfolio: SOC operations, Active Directory lab work, detection engineering, DFIR, AI security, and authorized offensive-security research." />
     <meta name="theme-color" content="#07111d" />
     <meta name="author" content="Dylan Senez" />
     <meta name="robots" content="index,follow" />
@@ -13,7 +13,7 @@
     <link rel="apple-touch-icon" href="./apple-touch-icon.png" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Dylan Senez — Cybersecurity Portfolio" />
-    <meta property="og:description" content="SOC operations, Active Directory lab work, detection engineering, DFIR, and authorized offensive-security research." />
+    <meta property="og:description" content="SOC operations, Active Directory lab work, detection engineering, DFIR, AI security, and authorized offensive-security research." />
     <meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png" />
     <meta property="og:url" content="https://dylans7j.github.io/Portfolio/index.html" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -27,17 +27,19 @@
     <header class="site-header">
       <a class="brand" href="#top" aria-label="Dylan Senez SOC Lab home">
         <span class="brand-mark" aria-hidden="true">DS</span>
-        <span>D4RKGUNN3R</span>
+        <span>Dylan Senez <small>/ D4RKGUNN3R</small></span>
       </a>
       <nav aria-label="Primary navigation">
         <a href="#profile">Profile</a>
         <a href="#architecture">Lab</a>
-        <a href="#evidence">Projects</a>
+        <a href="#evidence">Featured work</a>
+        <a href="#ai-security">AI security</a>
+        <a href="./projects.html">Projects</a>
         <a href="./write-ups.html">Writeups</a>
         <a href="#credentials">Credentials</a>
         <a href="#contact">Contact</a>
       </nav>
-      <span class="privacy-pill"><i aria-hidden="true"></i>Private portfolio</span>
+      <span class="privacy-pill"><i aria-hidden="true"></i>Security portfolio</span>
     </header>
 
     <main id="main">
@@ -47,12 +49,17 @@
           <h1 id="hero-title">I take the adversary’s path and leave defenders <em>a map of it.</em></h1>
           <p class="hero-lede">
             I’m Dylan Senez—a U.S. Coast Guard veteran focused on security operations,
-            incident investigation, detection engineering, and authorized penetration testing.
+            incident investigation, detection engineering, AI security, and authorized penetration testing.
             My work connects controlled attacks to defensible evidence and clear reporting.
           </p>
+          <p class="role-line">SOC &amp; DFIR <span>·</span> OFFENSIVE SECURITY <span>·</span> AI SECURITY</p>
           <div class="hero-actions">
-            <a class="button primary" href="#architecture">
-              Explore my work
+            <a class="button primary" href="#evidence">
+              Explore security projects
+              <span aria-hidden="true">↓</span>
+            </a>
+            <a class="button secondary" href="https://github.com/Dylans7j/Portfolio/raw/refs/heads/main/Dylan_Senez_Public_Resume.pdf" download>
+              Download résumé
               <span aria-hidden="true">↓</span>
             </a>
             <a class="button secondary" href="https://github.com/Dylans7j" target="_blank" rel="noreferrer">
@@ -78,8 +85,8 @@
         </aside>
 
         <div class="signal-strip reveal" aria-label="Lab highlights">
-          <div><strong>CJCA</strong><span>HTB certified analyst</span></div>
-          <div><strong>02</strong><span>SIEM platforms online</span></div>
+          <div><strong>CJCA</strong><span>HTB certified associate</span></div>
+          <div><strong>04</strong><span>WIN11 log sources verified in Splunk</span></div>
           <div><strong>AD</strong><span>attack + detection lab</span></div>
           <div><strong>DFIR</strong><span>evidence-driven investigations</span></div>
         </div>
@@ -98,8 +105,8 @@
           <article class="profile-card profile-main">
             <span class="card-label">WHOAMI</span>
             <h3>Dylan Senez</h3>
-            <p>Computer Science graduate with an Information Security concentration, U.S. Coast Guard veteran, and security operations professional based in Grand Rapids, Michigan.</p>
-            <p>My operational background is built around alert triage, disciplined escalation, incident documentation, and staying effective when the stakes are real.</p>
+            <p>Computer Science graduate with an Information Security concentration, U.S. Coast Guard veteran, and hands-on cybersecurity practitioner based in Grand Rapids, Michigan.</p>
+            <p>My military and physical security background brings disciplined escalation, accountability, and incident documentation. I apply that foundation to hands-on SOC, forensics, penetration-testing, and AI security labs.</p>
             <div class="profile-meta"><span>Grand Rapids, MI</span><span>Open to SOC · IR · Junior Pentest</span></div>
           </article>
           <article class="profile-card">
@@ -147,9 +154,9 @@
                 <path class="link confirmed" data-link="kali dc" d="M205 142 C290 142, 300 238, 410 238" />
                 <path class="link confirmed" data-link="kali win" d="M205 142 C330 142, 455 360, 570 360" />
                 <path class="link confirmed" data-link="dc sysmon sentinel" d="M520 238 C645 238, 675 110, 820 110" />
-                <path class="link confirmed" data-link="win sysmon sentinel" d="M680 360 C765 360, 760 160, 820 110" />
-                <path class="link staged" data-link="dc win splunk" d="M520 250 C590 280, 640 245, 710 248" />
-                <path class="link staged" data-link="splunk" d="M810 248 C860 248, 875 330, 875 402" />
+                <path class="link staged" data-link="win sysmon sentinel" d="M680 360 C765 360, 760 160, 820 110" />
+                <path class="link confirmed" data-link="dc win splunk" d="M520 250 C590 280, 640 245, 710 248" />
+                <path class="link confirmed" data-link="splunk" d="M810 248 C860 248, 875 330, 875 402" />
               </svg>
 
               <button class="node kali active" type="button" data-node="kali" aria-pressed="true">
@@ -207,7 +214,7 @@
             <p class="eyebrow">03 / EVIDENCE & PROJECTS</p>
             <h2 id="evidence-title">Work you can inspect.</h2>
           </div>
-          <p>Filter by technology, then open a concise case study for the objective, method, evidence, and next iteration.</p>
+          <p><a href="./write-ups.html">Read the investigations and technical articles ↗</a>, or <a href="./projects.html">browse the project overview</a>. Each article separates demonstrated results from work still in progress.</p>
         </div>
 
         <div class="filter-bar reveal" role="toolbar" aria-label="Filter projects by technology">
@@ -224,11 +231,12 @@
         <div class="project-grid reveal" id="projectGrid">
           <article class="project featured" data-tech="active-directory sentinel sysmon kali kql github" data-case="ad-lab">
             <div class="project-index">CASE 01</div>
-            <div class="project-state verified">Documented build</div>
+            <div class="project-state active-build">In progress · WIN11 telemetry verified</div>
             <h3>SOC–Active Directory Lab</h3>
-            <p>An isolated VMware range connecting identity, endpoint telemetry, controlled adversary activity, and cloud detection.</p>
+            <p>Isolated VMware lab with verified WIN11-to-Splunk telemetry. DC-01 DNS/SRV resolution and Splunk ingestion are documented in the project reports; detection validation continues.</p>
+            <p class="project-outcome"><b>Verified:</b> WIN11 Security, System, PowerShell and Sysmon events are indexed in Splunk. WIN11 Sentinel onboarding is deferred.</p>
             <div class="tech-list"><span>Active Directory</span><span>Sentinel</span><span>Kali</span><span>Sysmon</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab" target="_blank" rel="noreferrer">Evidence ↗</a></div>
           </article>
 
           <article class="project" data-tech="sentinel kql sysmon" data-case="kql-hunts">
@@ -236,8 +244,9 @@
             <div class="project-state active-build">Active work</div>
             <h3>KQL Detection & Hunt Pack</h3>
             <p>Reusable queries for process creation, authentication activity, suspicious parent-child relationships, and lab validation.</p>
+            <p class="project-outcome"><b>Outcome:</b> Published reusable KQL and SPL detections with evidence-focused investigation guidance.</p>
             <div class="tech-list"><span>KQL</span><span>Sentinel</span><span>Windows Events</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/detections" target="_blank" rel="noreferrer">Queries ↗</a></div>
           </article>
 
           <article class="project" data-tech="sysmon kql sentinel" data-case="event-4688">
@@ -245,6 +254,7 @@
             <div class="project-state verified">Completed exercise</div>
             <h3>Windows Event 4688 Investigation</h3>
             <p>Process-chain analysis using Security event data to investigate TCP beaconing without over-claiming attribution.</p>
+            <p class="project-outcome"><b>Outcome:</b> Reconstructed process ancestry while keeping observed facts separate from attribution.</p>
             <div class="tech-list"><span>Event ID 4688</span><span>Process Trees</span><span>TCP</span></div>
             <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
           </article>
@@ -253,18 +263,20 @@
             <div class="project-index">CASE 04</div>
             <div class="project-state verified">Platform online</div>
             <h3>Splunk SIEM Build</h3>
-            <p>Splunk Enterprise deployed on Ubuntu with service reachability validated; Windows ingestion is the next documented milestone.</p>
-            <div class="tech-list"><span>Splunk 10.4.2</span><span>Ubuntu</span><span>TCP 1137</span></div>
-            <button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button>
+            <p>Splunk Enterprise on Ubuntu with verified WIN11 Universal Forwarder ingestion across Security, System, PowerShell and Sysmon.</p>
+            <p class="project-outcome"><b>Verified:</b> 11,892 events in one selected 24-hour search, including 9,703 Sysmon events.</p>
+            <div class="tech-list"><span>Splunk 10.4.2</span><span>Ubuntu</span><span>Sysmon</span><span>TCP 9997</span></div>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/lab/dual-siem" target="_blank" rel="noreferrer">Build notes ↗</a></div>
           </article>
 
-          <article class="project" data-tech="kali github" data-case="ip-changer">
-            <div class="project-index">PROJECT 05</div>
-            <div class="project-state staged">Portfolio draft</div>
-            <h3>Kali IP Changer</h3>
-            <p>A related privacy-tooling concept for controlled proxy or Tor routing, tracked separately from the core SOC lab.</p>
-            <div class="tech-list"><span>Kali</span><span>Bash</span><span>GitHub draft</span></div>
-            <button class="case-button" type="button">Open details <span aria-hidden="true">↗</span></button>
+          <article class="project" data-tech="active-directory kali sysmon sentinel github" data-case="llmnr-poisoning">
+            <div class="project-index">CASE 05</div>
+            <div class="project-state verified">Documented investigation</div>
+            <h3>LLMNR/NBT-NS Poisoning</h3>
+            <p>Controlled Responder activity mapped from attack execution through Windows evidence, detection opportunities, and remediation.</p>
+            <p class="project-outcome"><b>Outcome:</b> Turned a credential-poisoning scenario into defensible evidence, detections, and mitigations.</p>
+            <div class="tech-list"><span>Responder</span><span>Active Directory</span><span>MITRE ATT&amp;CK</span></div>
+            <div class="project-actions"><button class="case-button" type="button">Open case study <span aria-hidden="true">↗</span></button><a href="https://github.com/Dylans7j/SOC-Lab/tree/main/case-studies/DE-004-LLMNR-NBTNS-Poisoning" target="_blank" rel="noreferrer">Evidence ↗</a></div>
           </article>
 
           <article class="project" data-tech="github" data-case="cs499">
@@ -272,6 +284,7 @@
             <div class="project-state verified">Published repository</div>
             <h3>CS 499 ePortfolio</h3>
             <p>A completed software engineering portfolio containing code review, enhanced artifacts, narratives, and a self-assessment.</p>
+            <p class="project-outcome"><b>Outcome:</b> Demonstrated structured code review, iterative engineering, and technical communication.</p>
             <div class="tech-list"><span>GitHub</span><span>Code Review</span><span>Engineering</span></div>
             <div class="project-actions">
               <button class="case-button" type="button">Open details <span aria-hidden="true">↗</span></button>
@@ -282,17 +295,67 @@
 
         <div class="evidence-note reveal">
           <div>
-            <span>CLAIM STANDARD</span>
+            <span>CLAIM STANDARD &amp; PRIVACY</span>
             <strong>Validated · Documented · Staged</strong>
           </div>
-          <p>“Validated” means the service, path, or answer was directly checked. “Documented” records completed build work. “Staged” is clearly identified as the next milestone.</p>
+          <p>“Validated” means the service, path, or answer was directly checked. “Documented” records completed build work. “Staged” is clearly identified as the next milestone. All displayed 192.0.2.x addresses are RFC 5737 documentation placeholders, not actual lab addresses.</p>
+        </div>
+      </section>
+
+      <section class="section" id="ai-security" aria-labelledby="ai-security-title">
+        <div class="section-heading">
+          <div><p class="eyebrow">CURRENT FOCUS / AI SECURITY</p><h2 id="ai-security-title">Test the model. Inspect the system.</h2></div>
+          <p>Hands-on AI Red Teamer training and local development: data poisoning, unsafe LLM tool use, application trust boundaries, and defensive controls.</p>
+        </div>
+        <div class="fieldwork-grid">
+          <article class="profile-card"><span class="card-label">LOCAL DEVELOPMENT · IN PROGRESS</span><h3>AEGIS AI</h3><p>Building a local cybersecurity assistant with Ollama and Streamlit. Separate assistant and vulnerable-lab environments support security research and controlled experiments.</p><p><b>Current milestone:</b> Local deployment and model experimentation. Assistant accuracy and security controls still require structured evaluation.</p><div class="skill-cloud"><span>Python</span><span>Ollama</span><span>Streamlit</span><span>Linux</span></div></article>
+          <article class="profile-card"><span class="card-label">COMPLETED HTB LAB · DATA POISONING</span><h3>Label flipping against a classifier</h3><p>Used NumPy to reproducibly flip 420 of 700 training labels with seed 1337, then trained a logistic-regression classifier and submitted its weights to the lab evaluator.</p><p><b>Observed result:</b> The evaluator returned 0.0067 accuracy and an attack-success result. This is a result from one controlled lab, not a claim about production models.</p><div class="skill-cloud"><span>NumPy</span><span>scikit-learn</span><span>Reproducibility</span></div></article>
+          <article class="profile-card"><span class="card-label">COMPLETED EXERCISES · LLM APPLICATIONS</span><h3>From prompt injection to unsafe execution</h3><p>Practiced function-calling abuse, SQL injection, cross-site scripting, exfiltration, and unsafe command construction in intentionally vulnerable AI applications.</p><p><b>Security focus:</b> Trace how untrusted model input or output reaches database queries, browser rendering, or operating-system commands; document the trust boundary and remediation.</p><div class="skill-cloud"><span>Prompt injection</span><span>Tool use</span><span>Output handling</span></div></article>
+          <article class="profile-card"><span class="card-label">TRAINING · IN PROGRESS</span><h3>AI Red Teamer / COAE preparation</h3><p>Current study covers AI data attacks, evasion, defense, and AI-assisted penetration testing. Practical notes connect attack setup, measured results, limitations, and defensive lessons.</p><p><b>Credential status:</b> Training in progress; COAE is not listed as an earned certification.</p><a href="https://app.hackthebox.com/users/2085969" target="_blank" rel="noopener noreferrer">View Hack The Box profile ↗</a></article>
+        </div>
+      </section>
+
+      <section class="section section-purple" id="purple" aria-labelledby="purple-title">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow">04 / PURPLE TEAM</p>
+            <h2 id="purple-title">Both sides of the same event.</h2>
+          </div>
+          <p>Every offensive chain in this lab gets a second pass as a defender: the event each step leaves behind, the rule that should catch it, and what still needs proving. <a href="./articles/purple-team-loop.html">Read the purple team loop &#8599;</a></p>
+        </div>
+        <div class="purple-grid reveal">
+          <article class="purple-card">
+            <span>DETECTION ENGINEERING</span>
+            <h3>Sigma first, then the SIEM</h3>
+            <p>Logic written against the event and the technique, not against whichever tool produced the log &mdash; then expressed again in KQL for Sentinel and SPL for Splunk.</p>
+            <div class="tags"><span>Sigma</span><span>KQL</span><span>SPL</span></div>
+          </article>
+          <article class="purple-card">
+            <span>TELEMETRY MAPPING</span>
+            <h3>Name the source before the rule</h3>
+            <p>Each attack step mapped to the event, host and field that would record it &mdash; including the steps Windows records nowhere, which are the findings worth reporting.</p>
+            <div class="tags"><span>Sysmon 1/3/22</span><span>4688</span><span>4624</span></div>
+          </article>
+          <article class="purple-card">
+            <span>DETECTION VALIDATION</span>
+            <h3>Prove it fires, prove it is quiet</h3>
+            <p>A positive run on the reproduced chain, a benign run against administrative baseline, then an attempt to bypass my own rule to see where it blinks.</p>
+            <div class="tags"><span>ATT&amp;CK</span><span>Tuning</span><span>Purple Team</span></div>
+          </article>
+        </div>
+        <div class="evidence-note reveal">
+          <div>
+            <span>COVERAGE, NOT CLAIMS</span>
+            <strong>Authored &middot; Validated &middot; Gap</strong>
+          </div>
+          <p>Detection status is published beside every rule. &ldquo;Authored&rdquo; means the logic exists and lints clean. &ldquo;Validated&rdquo; means it fired on a reproduced attack in my own lab. Gaps are listed as gaps &mdash; a coverage table with no gaps is usually a table nobody tested.</p>
         </div>
       </section>
 
       <section class="section fieldwork-section" id="fieldwork" aria-labelledby="fieldwork-title">
         <div class="section-heading reveal">
           <div>
-            <p class="eyebrow">04 / FIELDWORK</p>
+            <p class="eyebrow">05 / FIELDWORK</p>
             <h2 id="fieldwork-title">Beyond the core lab.</h2>
           </div>
           <p>Selected offensive, defensive, and software-engineering work carried over from my original portfolio.</p>
@@ -301,18 +364,22 @@
           <a class="field-card" href="https://github.com/Dylans7j/CHEATSHEETS" target="_blank" rel="noreferrer"><span>DEFENSIVE RESEARCH</span><h3>Forensics & Security Field Guides</h3><p>Practical references covering CSI Linux, iOS and memory forensics, steganalysis, web attacks, Wi-Fi testing, and Active Directory methodology.</p><b>Open repository ↗</b></a>
           <a class="field-card" href="https://github.com/Dylans7j/HackTheBox-Walkthroughs" target="_blank" rel="noreferrer"><span>OFFENSIVE METHODOLOGY</span><h3>Hack The Box Walkthroughs</h3><p>Structured notes that preserve the path from reconnaissance through foothold and privilege escalation, with emphasis on repeatable methodology.</p><b>Open repository ↗</b></a>
           <a class="field-card" href="https://github.com/Dylans7j/CS499-ePortfolio" target="_blank" rel="noreferrer"><span>SOFTWARE ENGINEERING</span><h3>CS 499 ePortfolio</h3><p>Completed capstone portfolio with code review, enhanced artifacts, technical narratives, and a professional self-assessment.</p><b>Open repository ↗</b></a>
-          <article class="field-card"><span>AUTHORIZED RESEARCH</span><h3>Network Boundary Assessment</h3><p>Scoped research using offline harnesses and controlled validation. Candidate findings remain clearly separated from confirmed results.</p><b>Evidence before claims</b></article>
+          <a class="field-card" href="mailto:dylan.senez@outlook.com?subject=Network%20boundary%20assessment%20brief"><span>AUTHORIZED RESEARCH</span><h3>Network Boundary Assessment</h3><p>Scoped research using offline harnesses and controlled validation. Candidate findings remain clearly separated from confirmed results.</p><b>Request the brief ↗</b></a>
         </div>
       </section>
 
       <section class="section credentials-section" id="credentials" aria-labelledby="credentials-title">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">05 / CREDENTIALS</p><h2 id="credentials-title">Foundation and focus.</h2></div>
+          <div><p class="eyebrow">06 / CREDENTIALS</p><h2 id="credentials-title">Foundation and focus.</h2></div>
           <p>Formal education, completed certification work, and the training tracks supporting my next role.</p>
         </div>
         <div class="credential-stack reveal">
-          <a href="https://www.credly.com/badges/ed2402f4-00ce-4322-a229-0c3564034ff3" target="_blank" rel="noreferrer"><span class="credential-code">CJCA</span><div><strong>HTB Certified Junior Cybersecurity Analyst</strong><small>Completed · Verify credential</small></div><i>↗</i></a>
-          <div><span class="credential-code">CDSA</span><div><strong>HTB Certified Defensive Security Analyst</strong><small>Learning path completed · Certification exam planned</small></div><i>PATH</i></div>
+          <a href="https://www.credly.com/badges/ed2402f4-00ce-4322-a229-0c3564034ff3" target="_blank" rel="noreferrer"><span class="credential-code">CJCA</span><div><strong>HTB Certified Junior Cybersecurity Associate</strong><small>Earned · Verify credential</small></div><i>↗</i></a>
+          <div><span class="credential-code">CDSA</span><div><strong>SOC Analyst Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
+          <div><span class="credential-code">CPTS</span><div><strong>Penetration Tester Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
+          <div><span class="credential-code">CWES</span><div><strong>Web Penetration Tester Job Role Path</strong><small>HTB Academy · Path completed</small></div><i>PATH</i></div>
+          <div><span class="credential-code">COAE</span><div><strong>AI Red Teamer Job Role Path</strong><small>HTB Academy · Training and exam preparation in progress</small></div><i>ACTIVE</i></div>
+          <div><span class="credential-code">SEC+</span><div><strong>CompTIA Security+ Preparation</strong><small>In progress</small></div><i>ACTIVE</i></div>
           <div><span class="credential-code">B.S.</span><div><strong>Computer Science — Information Security</strong><small>Southern New Hampshire University · Completed</small></div><i>DEGREE</i></div>
           <div><span class="credential-code">USCG</span><div><strong>U.S. Coast Guard Veteran</strong><small>Six years of service · Gunner’s Mate Second Class</small></div><i>SERVICE</i></div>
         </div>
@@ -320,8 +387,8 @@
 
       <section class="section contact-section" id="contact" aria-labelledby="contact-title">
         <div class="contact-panel reveal">
-          <div><p class="eyebrow">06 / CONTACT</p><h2 id="contact-title">Let’s connect.</h2><p>Open to SOC analyst, incident response, detection engineering, and junior penetration-testing opportunities.</p></div>
-          <div class="contact-links"><a href="https://github.com/Dylans7j" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/Dylans7j ↗</b></a><a href="https://www.linkedin.com/in/dylan-s-371496275" target="_blank" rel="noreferrer"><span>LinkedIn</span><b>Connect with Dylan ↗</b></a></div>
+          <div><p class="eyebrow">07 / CONTACT</p><h2 id="contact-title">Let’s connect.</h2><p>Open to SOC analyst, incident response, detection engineering, and junior penetration-testing opportunities.</p></div>
+          <div class="contact-links"><a href="mailto:dylan.senez@outlook.com"><span>Email</span><b>dylan.senez@outlook.com ↗</b></a><a href="https://github.com/Dylans7j" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/Dylans7j ↗</b></a><a href="https://www.linkedin.com/in/dylan-s-371496275" target="_blank" rel="noreferrer"><span>LinkedIn</span><b>Connect with Dylan ↗</b></a></div>
         </div>
       </section>
     </main>
@@ -329,7 +396,7 @@
     <footer>
       <div><span class="brand-mark" aria-hidden="true">DS</span><b>Dylan Senez</b></div>
       <p>SOC · Active Directory · DFIR · Offensive Security</p>
-      <p>Private portfolio · Evidence last reviewed September 2026</p>
+      <p>Public portfolio · Updated November 2026</p>
     </footer>
 
     <dialog class="case-dialog" id="caseDialog" aria-labelledby="caseTitle">

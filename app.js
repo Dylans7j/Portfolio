@@ -16,7 +16,7 @@ const nodeData = {
     title: "DC-01",
     summary: "Windows Server domain controller providing Active Directory Domain Services inside the host-only range.",
     network: "Host-only lab (documentation placeholder: 192.0.2.0/24)",
-    evidence: "LDAP TCP 389 reachable from WIN11. AD DNS SRV registration is being investigated; current DC-01 Splunk forwarding has not been verified.",
+    evidence: "AD DNS/SRV resolution and DC-01 Splunk ingestion are documented in the project reports; DE-001 and DE-002 include validated Windows Security detections.",
     tags: ["AD DS", "BadBlood", "Windows Server"]
   },
   win: {
@@ -137,7 +137,7 @@ const cases = {
       "The lab web interface is configured on TCP 1137.",
       "One 24-hour Splunk search returned 11,892 events across four sources, including 9,703 Sysmon events; counts are a snapshot, not an ingest-rate claim."
     ],
-    next: "Save sanitized WIN11 source screenshots and searches, verify DC-01 Security ingestion, resolve AD DNS SRV lookup, then validate a controlled failed-logon detection in SPL.",
+    next: "Expand the validated DE-001 and DE-002 authentication detections with additional endpoint correlation and benign-baseline testing.",
     link: "https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem"
   },
   "llmnr-poisoning": {

@@ -5,8 +5,8 @@ const nodeData = {
     statusClass: "confirmed",
     title: "Kali Linux",
     summary: "Attack workstation used to generate controlled network and authentication activity inside the isolated lab.",
-    network: "VMnet7: 192.0.2.10",
-    evidence: "Nmap AD service discovery, NetExec SMB/LDAP testing, and Sentinel validation.",
+    network: "Host-only lab (documentation placeholder: 192.0.2.0/24)",
+    evidence: "Nmap and NetExec used for isolated AD service discovery and testing; scenario-specific evidence is documented separately.",
     tags: ["Nmap", "NetExec", "Linux"]
   },
   dc: {
@@ -15,48 +15,48 @@ const nodeData = {
     statusClass: "confirmed",
     title: "DC-01",
     summary: "Windows Server domain controller providing Active Directory Domain Services inside the host-only range.",
-    network: "VMnet7 host-only segment",
-    evidence: "AD DS configured, BadBlood test data seeded, and DNS, Kerberos, LDAP, SMB, and RPC services observed during scanning.",
+    network: "Host-only lab (documentation placeholder: 192.0.2.0/24)",
+    evidence: "AD DNS/SRV resolution and DC-01 Splunk ingestion are documented in the project reports; DE-001 and DE-002 include validated Windows Security detections.",
     tags: ["AD DS", "BadBlood", "Windows Server"]
   },
   win: {
     kind: "DOMAIN ENDPOINT",
-    status: "Documented",
+    status: "Verified Splunk ingestion",
     statusClass: "confirmed",
-    title: "WIN-01",
-    summary: "Windows endpoint used for domain-member configuration and endpoint telemetry work; the build log is documented through its setup sequence.",
-    network: "VMnet7 host-only segment",
-    evidence: "Endpoint build progress, Windows event analysis, and planned repeatable attack-to-detection exercises.",
-    tags: ["Windows", "Domain Member", "Event Logs"]
+    title: "WIN11",
+    summary: "VMware Windows 11 endpoint forwarding Security, System, PowerShell Operational and Sysmon Operational events into Splunk.",
+    network: "Isolated lab + NAT; documentation placeholder: 192.0.2.0/24",
+    evidence: "Active Universal Forwarder to 192.0.2.10:9997; four indexed channels confirmed. DC-01 domain join and WIN11 Sentinel ingestion are not claimed.",
+    tags: ["Windows 11", "Universal Forwarder", "Sysmon", "Splunk"]
   },
   sysmon: {
     kind: "ENDPOINT SENSOR",
-    status: "Active work",
+    status: "Ingesting into Splunk",
     statusClass: "confirmed",
     title: "Sysmon",
     summary: "High-value Windows telemetry layer used to make process, network, and persistence behavior easier to investigate.",
     network: "Windows hosts → SIEM telemetry path",
-    evidence: "Process-creation analysis and parent-child correlation work; expanded coverage remains an active lab milestone.",
+    evidence: "31,000+ records verified on WIN11; a 24-hour Splunk search returned 9,703 Sysmon events. Process-creation Event ID 1 confirmed locally.",
     tags: ["Sysmon", "Process Trees", "Telemetry"]
   },
   splunk: {
     kind: "SELF-HOSTED SIEM",
-    status: "Platform online",
+    status: "WIN11 ingestion verified",
     statusClass: "confirmed",
     title: "SPLUNK-01",
     summary: "Ubuntu server running Splunk Enterprise as the lab’s self-hosted search and investigation platform.",
-    network: "VMware lab · web service on TCP 1137",
-    evidence: "Splunk Enterprise 10.4.2 installed, service running, and TCP reachability validated. Windows ingestion is staged next.",
+    network: "Host-only lab (documentation placeholder: 192.0.2.0/24); TCP 9997 receiver; TCP 1137 web",
+    evidence: "WIN11 Universal Forwarder is active. One 24-hour search returned 11,892 events across Security, System, PowerShell and Sysmon; 9,703 were Sysmon.",
     tags: ["Splunk 10.4.2", "Ubuntu", "TCP 1137"]
   },
   sentinel: {
     kind: "CLOUD SIEM",
-    status: "Receiving data",
-    statusClass: "confirmed",
+    status: "WIN11 onboarding deferred",
+    statusClass: "staged",
     title: "Microsoft Sentinel",
     summary: "Cloud SIEM used for lab telemetry, KQL hunts, and alert-development practice.",
     network: "Azure Monitor / data collection rule path",
-    evidence: "Azure Connected Machine Agent, DCR work, incoming data validation, custom KQL queries, and alert exercises.",
+    evidence: "Existing Sentinel research is documented separately. WIN11 has not been onboarded with Azure Arc or Azure Monitor Agent; its Sentinel ingestion is deferred.",
     tags: ["Sentinel", "KQL", "Azure Monitor"]
   }
 };
@@ -71,15 +71,16 @@ const cases = {
       "Isolated Active Directory lab traffic on the VMnet7 host-only network.",
       "Configured DC-01 with AD DS and seeded realistic directory objects using BadBlood.",
       "Used Kali to enumerate exposed AD services and generate controlled test activity.",
-      "Validated telemetry in Sentinel and established SPLUNK-01 as a second analysis platform."
+      "Validated WIN11 telemetry in Splunk; existing Sentinel research remains separate from the deferred WIN11 onboarding."
     ],
     evidence: [
-      "Kali connected to the VMnet7 lab at 192.0.2.10/24.",
+      "Kali connected to the VMnet7 lab at 192.0.2.10.",
       "Observed ports 53, 88, 135, 139, 389, and 445 on the domain controller during service discovery.",
       "Sentinel data and custom KQL work documented; Splunk service reachability independently checked.",
       "CrowdSec was removed from the current design and is not presented as deployed."
     ],
-    next: "Complete a repeatable attack matrix with saved telemetry, screenshots, queries, and report-ready findings for each scenario."
+    next: "Complete a repeatable attack matrix with saved telemetry, screenshots, queries, and report-ready findings for each scenario.",
+    link: "https://github.com/Dylans7j/SOC-Lab"
   },
   "kql-hunts": {
     kicker: "CASE 02 · DETECTION ENGINEERING",
@@ -97,7 +98,8 @@ const cases = {
       "Process-creation and parent-child investigation patterns used in Windows event exercises.",
       "Alert-development work tied to incoming lab data rather than static examples alone."
     ],
-    next: "Package each query with purpose, required tables, known limitations, test data, and an expected result screenshot before GitHub publication."
+    next: "Package each query with purpose, required tables, known limitations, test data, and an expected result screenshot.",
+    link: "https://github.com/Dylans7j/SOC-Lab/tree/main/detections"
   },
   "event-4688": {
     kicker: "CASE 03 · WINDOWS FORENSICS",
@@ -121,39 +123,41 @@ const cases = {
   "splunk-build": {
     kicker: "CASE 04 · SIEM ENGINEERING",
     title: "Splunk SIEM Build",
-    deck: "A self-hosted Splunk deployment that adds a second investigation workflow to the lab without overstating data onboarding progress.",
+    deck: "A self-hosted Ubuntu Splunk deployment with verified Windows 11 Security, System, PowerShell and Sysmon event ingestion.",
     facts: [["Host", "SPLUNK-01"], ["OS", "Ubuntu"], ["Version", "10.4.2"]],
     method: [
       "Installed the Linux AMD64 Splunk Enterprise package on Ubuntu.",
       "Started the service and validated the configured web endpoint.",
       "Confirmed TCP connectivity to the lab-specific service port.",
-      "Separated platform availability from the still-staged ingestion milestone."
+      "Onboarded the WIN11 Universal Forwarder, resolved Sysmon event-log read permissions, and verified four indexed event channels."
     ],
     evidence: [
       "Splunk Enterprise package: 10.4.2-33c3bf42cd73.",
-      "Service is running and the TCP test returned reachable.",
+      "Universal Forwarder active to 192.0.2.10:9997 and TCP receiver reachable.",
       "The lab web interface is configured on TCP 1137.",
-      "No claim is made here that Windows forwarder ingestion is complete."
+      "One 24-hour Splunk search returned 11,892 events across four sources, including 9,703 Sysmon events; counts are a snapshot, not an ingest-rate claim."
     ],
-    next: "Onboard DC-01 and WIN-01 with a Universal Forwarder, verify sourcetypes, then reproduce one Sentinel investigation in SPL."
+    next: "Expand the validated DE-001 and DE-002 authentication detections with additional endpoint correlation and benign-baseline testing.",
+    link: "https://github.com/Dylans7j/SOC-Lab/tree/main/Detection-engineering/Dual-Siem"
   },
-  "ip-changer": {
-    kicker: "PROJECT 05 · RELATED TOOLING",
-    title: "Kali IP Changer",
-    deck: "A separately tracked privacy-tooling idea for controlled routing through a proxy or Tor. It is not a component of the SOC telemetry architecture.",
-    facts: [["Platform", "Kali"], ["Format", "Bash"], ["State", "Draft"]],
+  "llmnr-poisoning": {
+    kicker: "CASE 05 · ATTACK TO DETECTION",
+    title: "LLMNR/NBT-NS Poisoning Investigation",
+    deck: "A controlled Active Directory scenario documenting how name-resolution poisoning creates credential exposure and how defenders can identify and reduce the risk.",
+    facts: [["Tool", "Responder"], ["Environment", "Isolated AD lab"], ["State", "Documented"]],
     method: [
-      "Define explicit direct, proxy, and Tor modes.",
-      "Verify routing state before and after each change.",
-      "Fail closed when dependencies or connectivity checks do not pass.",
-      "Keep the tool separate from lab evidence-generation scripts."
+      "Generated controlled LLMNR/NBT-NS poisoning activity from Kali inside the isolated lab.",
+      "Documented the attack path and the Windows and network evidence available to defenders.",
+      "Mapped the behavior to MITRE ATT&CK and separated observed evidence from expected indicators.",
+      "Recorded protocol-hardening, segmentation, and credential-protection recommendations."
     ],
     evidence: [
-      "Project requirements were defined for Kali and GitHub packaging.",
-      "Proxy or Tor routing was selected as the direction.",
-      "This portfolio labels it as a draft because publication is not verified."
+      "The complete scenario is published in the SOC-Lab repository.",
+      "The write-up preserves the controlled commands and relevant detection opportunities.",
+      "Remediation focuses on disabling legacy name-resolution protocols where feasible and reducing credential exposure."
     ],
-    next: "Finish validation, add rollback handling and transparent limitations, then publish only after verifying repository state."
+    next: "Add a tested KQL/SPL detection with an expected-result screenshot and documented false-positive considerations.",
+    link: "https://github.com/Dylans7j/SOC-Lab/blob/main/attack-scenarios/llmnr-nbtns-poisoning.md"
   },
   cs499: {
     kicker: "PROJECT 06 · SOFTWARE ENGINEERING",

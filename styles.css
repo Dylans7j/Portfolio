@@ -376,3 +376,11 @@ footer .brand-mark { width: 28px; height: 28px; font-size: 9px; }
 .purple-card .tags span { font-size: 10px; letter-spacing: .04em; color: #c4bcd8; border: 1px solid rgba(167, 139, 250, .3); border-radius: 99px; padding: 3px 9px; }
 .section-purple .eyebrow { color: #c4b5fd; }
 @media (max-width: 900px){.purple-grid{grid-template-columns:1fr}}
+
+/* Keep long technical labels and narrow screens readable. */
+#ai-security .profile-card { min-width: 0; }
+#ai-security .profile-card p { line-height: 1.75; }
+#ai-security .profile-card p + p { margin-top: 1rem; }
+#ai-security .skill-cloud { margin-top: 1.25rem; }
+:focus-visible { outline: 2px solid var(--accent, #69e6ba); outline-offset: 5px; }
+@media (max-width: 760px) { .site-header nav { flex-wrap: wrap; } }
