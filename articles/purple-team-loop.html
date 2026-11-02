@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>The purple team loop: a red finding is only half an answer — Dylan Senez</title><meta name="description" content="How an offensive chain becomes detection logic: mapping the telemetry each attack step leaves behind, writing rules against the event, and testing them against benign activity before calling them done."><meta name="theme-color" content="#07111d"><link rel="canonical" href="https://dylans7j.github.io/Portfolio/articles/purple-team-loop.html"><meta property="og:title" content="The purple team loop: a red finding is only half an answer"><meta property="og:description" content="Emulate, map telemetry, author logic, test the positive, test the negative, hand it back to red. Two lab chains worked end to end."><meta property="og:type" content="article"><meta property="og:image" content="https://dylans7j.github.io/Portfolio/og.png"><link rel="icon" href="../favicon.svg"><link rel="stylesheet" href="../styles.css"><link rel="stylesheet" href="../articles.css"></head><body><a class="skip-link" href="#main">Skip to content</a><header class="site-header"><a class="brand" href="../index.html"><span class="brand-mark">DS</span><span>Dylan Senez <small>/ D4RKGUNN3R</small></span></a><nav aria-label="Primary navigation"><a href="../index.html#profile">Profile</a><a href="../index.html#architecture">Lab</a><a href="../index.html#evidence">Featured work</a><a href="../index.html#purple">Purple team</a><a href="../projects.html">Projects</a><a href="../write-ups.html" aria-current="page">Writeups</a><a href="../index.html#credentials">Credentials</a><a href="../index.html#contact">Contact</a></nav></header><main id="main" class="journal"><section class="journal-hero"><p class="eyebrow">PURPLE TEAM / DETECTION ENGINEERING / 10 MIN READ</p><h1>The purple team loop: a red finding is only half an answer</h1><p>How an offensive chain becomes detection logic: mapping the telemetry each attack step leaves behind, writing rules against the event instead of the tool, and testing them against benign activity before calling them done.</p><p class="article-state">Loop documented · rules authored · environment validation in progress</p><div class="article-tags"><span>Purple Team</span><span>Detection Engineering</span><span>Sigma</span><span>KQL</span><span>SPL</span><span>Sysmon</span><span>ATT&amp;CK</span></div></div><div class="source-note">Written for this portfolio from my own lab work rather than generated from a single Markdown source. Detection logic is authored from the ATT&amp;CK technique and the telemetry each step produces. Where a rule has not yet been run against a live stack, the status column says so — none of this is presented as a production-tuned detection.</div><div class="reading-layout"><nav class="toc" aria-label="On this page"><strong>ON THIS PAGE</strong><a href="#status">Status</a><a href="#why-the-loop">Why the loop</a><a href="#six-steps">The six steps</a><a href="#case-name-resolution">Case one: name resolution</a><a href="#case-agent">Case two: agent to shell</a><a href="#rule-survival">What makes a rule survive</a><a href="#false-positive-budget">False-positive budget</a><a href="#coverage">Coverage snapshot</a><a href="#handback">Handing it back to red</a><a href="#next-step">Next validation step</a></nav><article class="article-body">
+<h2 id="status">Status</h2>
+<p>Purple team work fails in a predictable way: the attack gets written up, the rule gets written, and nobody ever checks whether the rule fires on the attack or stays quiet on a normal Tuesday. This article is the check. Every artifact below carries an explicit state.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Artifact</th>
+<th>What it is</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Attack chain — broadcast name resolution to NTLM relay</td>
+<td>Simulated in an isolated lab network against a member server</td>
+<td>Documented</td>
+</tr>
+<tr>
+<td>Telemetry map</td>
+<td>Which event each attack step would have to create, and which ones Windows does not create at all</td>
+<td>Documented</td>
+</tr>
+<tr>
+<td>Sigma rules (5)</td>
+<td>Portable logic, ATT&amp;CK-tagged, structurally validated</td>
+<td>Authored · lint-clean</td>
+</tr>
+<tr>
+<td>Splunk SPL and Sentinel KQL</td>
+<td>Same behaviors expressed for the two SIEMs I work in</td>
+<td>Authored · logic reviewed</td>
+</tr>
+<tr>
+<td>Benign-activity run</td>
+<td>Rule executed against administrative baseline traffic</td>
+<td>Not yet executed on a live stack</td>
+</tr>
+<tr>
+<td>Coverage matrix</td>
+<td>Technique to event to rule, with gaps named</td>
+<td>Maintained</td>
+</tr>
+</tbody></table></div>
+<p>Two of those rows are honest gaps, not finished work. I would rather publish a status table that says "not yet executed" than a detection library that implies coverage it has never demonstrated.</p>
+
+<h2 id="why-the-loop">Why the loop</h2>
+<p>Red work proves I can reach a host. Blue work proves I can see a host. Neither one shows the thing employers actually pay for, which is the connection between them: the moment an attack technique changes the detection, and the detection changes the next attack.</p>
+<p>That sounds abstract until you do it once. On the first chain below, the attack succeeded and the detection I expected to fire <em>did not exist</em>, because the event I assumed Windows recorded is generated on the attacker's host, not the victim's. No amount of tuning fixes a rule watching the wrong side of the wire. The loop is what surfaced that, and the loop is what I now run every time instead of writing rules from imagination.</p>
+<blockquote>The detection you can't source telemetry for isn't a detection. It's a hypothesis with YAML syntax.</blockquote>
+
+<h2 id="six-steps">The six steps</h2>
+<ol>
+<li><strong>Reproduce from notes, not memory.</strong> Re-run the chain using the written walkthrough. Record start time, end time, source host, destination host, and the exact command for each step. If I can't reproduce it, I can't test a rule against it.</li>
+<li><strong>Map telemetry before writing logic.</strong> For each step, ask: which event ID, on which host, in which log, with which field? Write down the answer. Where the answer is "none", that is a visibility gap and it is more valuable than the rule.</li>
+<li><strong>Author the logic against the event.</strong> Sigma first, because it forces me to name the log source and the field instead of reaching for whatever my SIEM happens to call it. Then translate to SPL and KQL.</li>
+<li><strong>Test the positive.</strong> Does it fire on the reproduced chain, once, with the fields I can actually triage on?</li>
+<li><strong>Test the negative.</strong> Does it stay quiet during normal administrative activity? This step kills most rules, and skipping it is why detection libraries rot.</li>
+<li><strong>Hand it back to red.</strong> What is the cheapest change an attacker makes to get around this rule? Then revise. The revision is the deliverable.</li>
+</ol>
+<p>Steps 2 and 5 are the ones people skip. Step 2 is where the real finding lives. Step 5 is the difference between a rule that survives a week in production and a rule that gets muted on day two.</p>
+
+<h2 id="case-name-resolution">Case one: broadcast name resolution poisoning</h2>
+<p>This is the chain behind the LLMNR / NBT-NS case on my projects page. A victim needs to resolve a name, the DNS query fails, Windows falls back to a broadcast, and whoever answers first gets an NTLM authentication attempt from the victim. That authentication can be captured to crack offline, or relayed to another host.</p>
+<h3>Attack view</h3>
+<ul>
+<li>Victim attempts to resolve a hostname that does not exist in DNS.</li>
+<li>Victim broadcasts on LLMNR (UDP 5355) and NBT-NS (UDP 137).</li>
+<li>Attacker host answers the broadcast, claiming the name.</li>
+<li>Victim opens SMB to the attacker and sends an NTLM negotiation.</li>
+<li>Attacker cracks the challenge response, or relays it to a target that does not enforce SMB signing.</li>
+</ul>
+<h3>Telemetry map</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>What would record it</th>
+<th>Reality</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Victim broadcast query</td>
+<td>Sysmon Event ID 22 (DnsQuery) if DNS client auditing is on; otherwise only a network sensor</td>
+<td>Partial — Sysmon 22 does not reliably capture LLMNR/NBT-NS fallbacks on every build</td>
+</tr>
+<tr>
+<td>Attacker answer</td>
+<td>Zeek <code>dns.log</code> / Suricata, or full packet capture</td>
+<td>Gap in my lab — no passive sensor in the path yet</td>
+</tr>
+<tr>
+<td>Victim connects to attacker on 445</td>
+<td>Sysmon Event ID 3 (NetworkConnect), or Security 5156</td>
+<td>Available</td>
+</tr>
+<tr>
+<td>NTLM authentication arriving at the attacker</td>
+<td>Security 4624 on the <em>attacker's</em> host</td>
+<td>Effectively absent — attacker hosts do not forward logs</td>
+</tr>
+<tr>
+<td>Relayed authentication at the target</td>
+<td>Security 4624, logon type 3, NTLM package</td>
+<td>Available — this is the detection surface</td>
+</tr>
+</tbody></table></div>
+<p>The last row is the useful one. I cannot see the poison, but I can see the authentication that arrives because of it, at the host that receives it. A workstation-to-server NTLM network logon is not normal in a domain that has moved to Kerberos, and it is exactly what a relay produces.</p>
+<h3>Detection A — NTLM network logon to a member server</h3>
+<pre><code>title: NTLM Network Logon to Member Server from Workstation
+status: experimental
+logsource:
+  product: windows
+  service: security
+detection:
+  selection:
+    EventID: 4624
+    LogonType: 3
+    AuthenticationPackageName: NTLM
+  filter_machine_account:
+    TargetUserName|endswith: '$'
+  condition: selection and not filter_machine_account
+falsepositives:
+  - Legacy file shares, NAS appliances and printers that only speak NTLM
+  - Workgroup-joined hosts inside an otherwise domain-joined estate
+level: medium
+tags:
+  - attack.lateral_movement
+  - attack.t1557.001
+  - attack.t1550.002</code></pre>
+<p>Deliberately no DC exclusion in the rule body. Excluding domain controllers by hostname is the fragile version of this rule and it breaks the first time a DC is renamed or a new one is promoted. If the environment needs that scope, it belongs in an asset-role lookup or a watchlist join, not in a hardcoded string list.</p>
+<h3>Detection B — broadcast resolution fallback burst</h3>
+<pre><code>title: Burst of Single-Label DNS Queries from One Host
+status: experimental
+logsource:
+  category: dns_query
+detection:
+  selection:
+    QueryName|re: '^[A-Za-z0-9_-]{3,20}$'
+  condition: selection | count() by Computer, QueryName &gt; 15</code></pre>
+<p><strong>Status: authored, not validated.</strong> The aggregation syntax above is Sigma's correlation-style counting and needs compiling for the target backend — in Splunk and Sentinel I express it as <code>stats</code> / <code>summarize</code> instead. And the underlying event is only as good as the sensor: without Zeek or a host actually emitting Sysmon 22 for fallback queries, this rule has nothing to count. I include it as the shape of the detection I want, not as coverage I can claim.</p>
+<h3>Splunk hunt for the relay surface</h3>
+<pre><code>index=wineventlog sourcetype="WinEventLog:Security" EventCode=4624 Logon_Type=3 Authentication_Package=NTLM
+| eval src=coalesce(Source_Network_Address, IpAddress)
+| where NOT match(Account_Name, "\$$")
+| stats count dc(src) AS sources values(Workstation_Name) AS workstations
+        BY ComputerName, Account_Name
+| where sources &gt; 2
+| sort - sources</code></pre>
+<p>Two or more distinct sources authenticating with NTLM to the same account on the same server in one window is the shape of a relay, not of a user at a desk. The threshold is intentionally low because the baseline in a Kerberos-only estate should be near zero — which is a claim I have to measure before I trust it, and the reason the benign run is still listed as pending.</p>
+<h3>What actually removes the technique</h3>
+<p>Detection is the consolation prize here. The fix is configuration: disable LLMNR through Group Policy (<code>EnableMulticast=0</code>), disable NBT-NS on adapters, enforce SMB signing and Extended Protection for Authentication so a relay has nothing to authenticate to, and stop allowing SMB between workstation subnets. A detection that fires while the technique still works is a monitoring success and a security failure at the same time, and both belong in the report.</p>
+
+<h2 id="case-agent">Case two: from prompt to shell</h2>
+<p>The second chain is the one I care about more, because it is where most blue teams currently have no coverage at all: a tool-capable LLM agent that can execute commands. Injecting the model is step one; the interesting part for a defender is that the agent's runtime, not a person, becomes the parent process of a shell.</p>
+<h3>Attack view</h3>
+<ul>
+<li>Untrusted text reaches the model as context — a document, a web page, a tool result.</li>
+<li>The injected instruction causes the agent to call a tool that executes a command.</li>
+<li>The runtime spawns a shell or an interpreter as a child process.</li>
+<li>Egress follows: a download, a callback, or a staged payload.</li>
+</ul>
+<h3>Telemetry map</h3>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Event</th>
+<th>Why it matters</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Prompt reaches the model</td>
+<td>Application or proxy logs; WAF body inspection if the agent is HTTP-facing</td>
+<td>The only place the injection itself is visible</td>
+</tr>
+<tr>
+<td>Tool call executes</td>
+<td>Application log, if the agent logs tool invocations</td>
+<td>Usually the missing link — most agent frameworks log to stdout only</td>
+</tr>
+<tr>
+<td>Shell spawned</td>
+<td>Sysmon Event ID 1 or Security 4688 with command line</td>
+<td>Highest-signal event: a web/app runtime becoming the parent of bash or PowerShell</td>
+</tr>
+<tr>
+<td>Payload dropped</td>
+<td>Sysmon Event ID 11 in temp or app directories</td>
+<td>Corroborates intent when the command line is obfuscated</td>
+</tr>
+<tr>
+<td>Egress</td>
+<td>Sysmon Event ID 3, proxy logs, DNS</td>
+<td>Distinguishes a failed injection from a successful one</td>
+</tr>
+</tbody></table></div>
+<h3>Detection C — interpreter spawned by an agent runtime</h3>
+<pre><code>title: Shell Spawned by LLM Agent Runtime
+status: experimental
+logsource:
+  category: process_creation
+  product: windows
+detection:
+  parent:
+    ParentImage|endswith:
+      - '\node.exe'
+      - '\python.exe'
+      - '\python3.exe'
+  child:
+    Image|endswith:
+      - '\cmd.exe'
+      - '\powershell.exe'
+      - '\bash.exe'
+      - '\wsl.exe'
+  suspicious_cli:
+    CommandLine|contains:
+      - '/dev/tcp/'
+      - 'curl '
+      - 'wget '
+      - 'base64 -d'
+      - 'Invoke-WebRequest'
+      - 'DownloadString'
+  condition: parent and child and suspicious_cli
+falsepositives:
+  - Developer workstations running agents against a local sandbox
+  - CI runners where node legitimately shells out to a build tool
+level: high
+tags:
+  - attack.execution
+  - attack.t1059.001
+  - attack.t1059.004
+  - attack.t1105</code></pre>
+<p>The parent-process condition is the whole rule. "PowerShell ran" is noise; "PowerShell ran as a child of the agent runtime with a download cradle in the command line" is a finding. The same logic ports to Linux by swapping the parent images for the service user and keeping the child list.</p>
+<h3>Sentinel KQL for the same behavior</h3>
+<pre><code>DeviceProcessEvents
+| where InitiatingProcessFileName in~ ("node.exe","python.exe","python3.exe")
+| where FileName in~ ("cmd.exe","powershell.exe","bash.exe","wsl.exe")
+| where ProcessCommandLine has_any ("/dev/tcp/","curl ","wget ","base64 -d","Invoke-WebRequest","DownloadString")
+| project Timestamp, DeviceName, AccountName, InitiatingProcessFileName, FileName, ProcessCommandLine</code></pre>
+<p>On the prevention side there is a compensating control worth naming: inspecting inbound content for instruction-shaped patterns at the edge, before it ever reaches the model. It is a filter, not a detection — it raises the cost of the attack and produces nothing in the SIEM. I treat it as one layer, never as the answer.</p>
+
+<h2 id="rule-survival">What makes a rule survive</h2>
+<p>Four tests, in this order. A rule that fails any of them is a draft.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Question</th>
+<th>Failure looks like</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Positive</td>
+<td>Does it fire once, on the reproduced chain, with fields I can triage on?</td>
+<td>Fires but only shows a hostname and no user — untriageable</td>
+</tr>
+<tr>
+<td>Variant</td>
+<td>Does it still fire when the attacker changes one thing — PowerShell instead of bash, a different download tool, an encoded command?</td>
+<td>The rule names a single tool instead of a behavior</td>
+</tr>
+<tr>
+<td>Benign</td>
+<td>Does it stay quiet during patching, backup, admin scripts and onboarding?</td>
+<td>Fires 400 times a day and gets muted by lunchtime</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td>Would it still be readable if the estate were 50 times larger?</td>
+<td>Every alert needs one analyst-hour of context rebuilding</td>
+</tr>
+</tbody></table></div>
+<p>The variant test is where Sigma earns its place. Writing the logic against <code>T1059</code> behavior rather than against a specific binary is what makes a rule survive the attacker's first adjustment — and it is also what makes the false-positive surface bigger, which is why the benign test comes right after it.</p>
+
+<h2 id="false-positive-budget">False-positive budget</h2>
+<p>Every exclusion is a hole with a comment attached. I write them as narrowly as the evidence allows and record why, so the next analyst can tell a considered exclusion from a lazy one.</p>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Expected benign source</th>
+<th>Tuning lever</th>
+<th>Cost of over-tuning</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NTLM network logon to member server</td>
+<td>NAS, printers scanning to SMB, legacy line-of-business app</td>
+<td>Whitelist by destination asset + protocol, not by source IP</td>
+<td>Excluding the source means the relay just moves to that host</td>
+</tr>
+<tr>
+<td>Broadcast resolution burst</td>
+<td>Printer discovery, WS-Discovery, legacy NetBIOS apps</td>
+<td>Require the queried name to be unresolvable, and the same name from multiple hosts</td>
+<td>Excluding known names loses the exact behavior being hunted</td>
+</tr>
+<tr>
+<td>Shell spawned by agent runtime</td>
+<td>Developer sandboxes, CI build steps</td>
+<td>Scope to servers running the agent service, exclude interactive dev sessions</td>
+<td>Excluding the whole parent path lets the agent do anything it wants</td>
+</tr>
+</tbody></table></div>
+<p>None of these exclusions are applied yet. They are the levers I would pull after measuring the baseline, which is the correct order and the one I keep having to defend to myself when I want to ship a rule faster.</p>
+
+<h2 id="coverage">Coverage snapshot</h2>
+<div class="table-scroll"><table>
+<thead>
+<tr>
+<th>Technique</th>
+<th>Telemetry</th>
+<th>Rule</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>T1557.001 — LLMNR/NBT-NS poisoning and SMB relay</td>
+<td>Security 4624 type 3, NTLM</td>
+<td>Detection A</td>
+<td>Authored · lint-clean</td>
+</tr>
+<tr>
+<td>T1557.001 — broadcast fallback</td>
+<td>Zeek <code>dns.log</code> / Sysmon 22</td>
+<td>Detection B</td>
+<td>Gap — no sensor in path</td>
+</tr>
+<tr>
+<td>T1059.001 / T1059.004 — interpreter execution</td>
+<td>Sysmon 1, 4688</td>
+<td>Detection C</td>
+<td>Authored · lint-clean</td>
+</tr>
+<tr>
+<td>T1105 — ingress tool transfer</td>
+<td>Sysmon 3, proxy</td>
+<td>Merged into Detection C</td>
+<td>Partial — command-line dependent</td>
+</tr>
+<tr>
+<td>T1071 — application layer C2</td>
+<td>DNS, proxy, flow</td>
+<td>None</td>
+<td>Gap — needs egress baseline</td>
+</tr>
+</tbody></table></div>
+<p>Three of five rows are partial or absent. That is the normal state of a lab this size, and writing it down is the point: a coverage table with no gaps is usually a coverage table nobody tested.</p>
+
+<h2 id="handback">Handing it back to red</h2>
+<p>The last step is the one that makes this purple instead of blue with extra steps. I attack my own rule.</p>
+<ul>
+<li><strong>Use a name that resolves legitimately.</strong> Register the hostname in DNS and the broadcast never happens — Detection B is bypassed, Detection A still has to catch the authentication.</li>
+<li><strong>Authenticate with Kerberos instead of NTLM.</strong> Detection A is blind by construction. The mitigation is SMB signing, not a better query.</li>
+<li><strong>Relay to a domain controller instead of a member server.</strong> Scoped-out targets are the most common hole in this rule family.</li>
+<li><strong>For the agent chain, drop the download cradle.</strong> A single <code>bash -c</code> with an inline payload never touches <code>curl</code>, so the command-line list in Detection C misses it — the parent-child pair has to carry the rule alone.</li>
+</ul>
+<p>Each of those is a rule change, and each one is a sentence I can put in a report: here is what the detection covers, here is what it does not, here is the compensating control for the gap. That is a more useful artifact than a green checkmark.</p>
+
+<h2 id="next-step">Next validation step</h2>
+<p>To move this from authored to validated I need four pieces of evidence, in the same window, from the lab:</p>
+<ol>
+<li>Sysmon Event ID 1 from a controlled agent-triggered shell, with the parent chain intact.</li>
+<li>Security 4624 logon type 3 with NTLM package on the member server, during the relay test.</li>
+<li>Seven days of benign baseline for the same hosts, so the "near zero" assumption is measured instead of asserted.</li>
+<li>A Zeek or Suricata capture of the broadcast exchange, which is the only thing that can close Detection B.</li>
+</ol>
+<p>When those exist, the status table at the top of this page changes from <em>authored</em> to <em>validated</em>, and the coverage snapshot gains two rows. Until then the honest description of this work is: logic written, structure checked, execution pending.</p>
+<p>Related: <a href="./smb-authentication-visibility.html">A failed logon is evidence, not a verdict</a> covers the 4625 baseline this loop depends on, and the <a href="../write-ups.html">article library</a> has the offensive walkthroughs that feed it.</p>
+</article></div><footer class="journal-footer">Dylan Senez / d4rkgunn3r · Authorized labs. Evidence before conclusions.<br><a href="../write-ups.html">Article library</a> · <a href="https://github.com/Dylans7j/Portfolio">Site source</a></footer></main></body></html>

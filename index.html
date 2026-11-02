@@ -33,6 +33,7 @@
         <a href="#profile">Profile</a>
         <a href="#architecture">Lab</a>
         <a href="#evidence">Featured work</a>
+        <a href="#purple">Purple team</a>
         <a href="./projects.html">Projects</a>
         <a href="./write-ups.html">Writeups</a>
         <a href="#credentials">Credentials</a>
@@ -301,10 +302,47 @@
         </div>
       </section>
 
+      <section class="section section-purple" id="purple" aria-labelledby="purple-title">
+        <div class="section-heading reveal">
+          <div>
+            <p class="eyebrow">04 / PURPLE TEAM</p>
+            <h2 id="purple-title">Both sides of the same event.</h2>
+          </div>
+          <p>Every offensive chain in this lab gets a second pass as a defender: the event each step leaves behind, the rule that should catch it, and what still needs proving. <a href="./articles/purple-team-loop.html">Read the purple team loop &#8599;</a></p>
+        </div>
+        <div class="purple-grid reveal">
+          <article class="purple-card">
+            <span>DETECTION ENGINEERING</span>
+            <h3>Sigma first, then the SIEM</h3>
+            <p>Logic written against the event and the technique, not against whichever tool produced the log &mdash; then expressed again in KQL for Sentinel and SPL for Splunk.</p>
+            <div class="tags"><span>Sigma</span><span>KQL</span><span>SPL</span></div>
+          </article>
+          <article class="purple-card">
+            <span>TELEMETRY MAPPING</span>
+            <h3>Name the source before the rule</h3>
+            <p>Each attack step mapped to the event, host and field that would record it &mdash; including the steps Windows records nowhere, which are the findings worth reporting.</p>
+            <div class="tags"><span>Sysmon 1/3/22</span><span>4688</span><span>4624</span></div>
+          </article>
+          <article class="purple-card">
+            <span>DETECTION VALIDATION</span>
+            <h3>Prove it fires, prove it is quiet</h3>
+            <p>A positive run on the reproduced chain, a benign run against administrative baseline, then an attempt to bypass my own rule to see where it blinks.</p>
+            <div class="tags"><span>ATT&amp;CK</span><span>Tuning</span><span>Purple Team</span></div>
+          </article>
+        </div>
+        <div class="evidence-note reveal">
+          <div>
+            <span>COVERAGE, NOT CLAIMS</span>
+            <strong>Authored &middot; Validated &middot; Gap</strong>
+          </div>
+          <p>Detection status is published beside every rule. &ldquo;Authored&rdquo; means the logic exists and lints clean. &ldquo;Validated&rdquo; means it fired on a reproduced attack in my own lab. Gaps are listed as gaps &mdash; a coverage table with no gaps is usually a table nobody tested.</p>
+        </div>
+      </section>
+
       <section class="section fieldwork-section" id="fieldwork" aria-labelledby="fieldwork-title">
         <div class="section-heading reveal">
           <div>
-            <p class="eyebrow">04 / FIELDWORK</p>
+            <p class="eyebrow">05 / FIELDWORK</p>
             <h2 id="fieldwork-title">Beyond the core lab.</h2>
           </div>
           <p>Selected offensive, defensive, and software-engineering work carried over from my original portfolio.</p>
@@ -319,7 +357,7 @@
 
       <section class="section credentials-section" id="credentials" aria-labelledby="credentials-title">
         <div class="section-heading reveal">
-          <div><p class="eyebrow">05 / CREDENTIALS</p><h2 id="credentials-title">Foundation and focus.</h2></div>
+          <div><p class="eyebrow">06 / CREDENTIALS</p><h2 id="credentials-title">Foundation and focus.</h2></div>
           <p>Formal education, completed certification work, and the training tracks supporting my next role.</p>
         </div>
         <div class="credential-stack reveal">
@@ -335,7 +373,7 @@
 
       <section class="section contact-section" id="contact" aria-labelledby="contact-title">
         <div class="contact-panel reveal">
-          <div><p class="eyebrow">06 / CONTACT</p><h2 id="contact-title">Let’s connect.</h2><p>Open to SOC analyst, incident response, detection engineering, and junior penetration-testing opportunities.</p></div>
+          <div><p class="eyebrow">07 / CONTACT</p><h2 id="contact-title">Let’s connect.</h2><p>Open to SOC analyst, incident response, detection engineering, and junior penetration-testing opportunities.</p></div>
           <div class="contact-links"><a href="mailto:dylan.senez@outlook.com"><span>Email</span><b>dylan.senez@outlook.com ↗</b></a><a href="https://github.com/Dylans7j" target="_blank" rel="noreferrer"><span>GitHub</span><b>github.com/Dylans7j ↗</b></a><a href="https://www.linkedin.com/in/dylan-s-371496275" target="_blank" rel="noreferrer"><span>LinkedIn</span><b>Connect with Dylan ↗</b></a></div>
         </div>
       </section>

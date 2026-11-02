@@ -365,3 +365,14 @@ footer .brand-mark { width: 28px; height: 28px; font-size: 9px; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Purple team section */
+.purple-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.purple-card { display: flex; flex-direction: column; min-height: 240px; padding: 26px; border: 1px solid rgba(167, 139, 250, .28); border-radius: var(--radius); background: linear-gradient(180deg, rgba(38, 25, 64, .55), transparent 72%), var(--panel); }
+.purple-card > span { color: #c4b5fd; font-size: 10px; letter-spacing: .12em; font-weight: 700; }
+.purple-card h3 { margin: 12px 0 0; font-size: 21px; line-height: 1.2; letter-spacing: -.01em; }
+.purple-card p { margin: 10px 0 0; color: var(--muted); font-size: 13px; line-height: 1.6; }
+.purple-card .tags { margin-top: auto; padding-top: 18px; display: flex; flex-wrap: wrap; gap: 6px; }
+.purple-card .tags span { font-size: 10px; letter-spacing: .04em; color: #c4bcd8; border: 1px solid rgba(167, 139, 250, .3); border-radius: 99px; padding: 3px 9px; }
+.section-purple .eyebrow { color: #c4b5fd; }
+@media (max-width: 900px){.purple-grid{grid-template-columns:1fr}}

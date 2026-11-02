@@ -45,6 +45,16 @@
   },
   "manual": [
     {
+      "category": "purple",
+      "eyebrow": "PURPLE TEAM / DETECTION ENGINEERING / 10 MIN READ",
+      "title": "The purple team loop: a red finding is only half an answer",
+      "summary": "Reproduce the chain, map the telemetry each step leaves behind, author Sigma, KQL and SPL logic against the event, then test the rule against benign activity before calling it done.",
+      "state": "Loop documented · rules authored · validation in progress",
+      "tags": ["Purple Team", "Detection Engineering", "Sigma", "KQL", "Splunk", "Sysmon"],
+      "linkText": "Read the article →",
+      "url": "./articles/purple-team-loop.html"
+    },
+    {
       "category": "machine",
       "eyebrow": "OFFENSIVE SECURITY / HACK THE BOX / MEDIUM LINUX",
       "title": "Builder: evidence-driven machine write-up",
